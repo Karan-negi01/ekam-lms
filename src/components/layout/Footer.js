@@ -42,9 +42,8 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#080604', borderTop: '1px solid #1C1510' }}>
-      {/* Top decorative bar */}
-      <div className="h-px w-full" style={{ background: 'linear-gradient(to right, transparent, #D4A843, transparent)' }} />
+    <footer style={{ background: '#F5EFE4', borderTop: '1px solid #E2D5C4' }}>
+      <div className="h-px w-full" style={{ background: 'linear-gradient(to right, transparent, rgba(140,98,16,0.35), transparent)' }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-8">
         {/* Brand & Newsletter */}
@@ -52,8 +51,8 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
-                <span className="text-ekam-bg font-display font-bold text-xl">ए</span>
+                style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
+                <span className="text-white font-display font-bold text-xl">ए</span>
               </div>
               <div>
                 <span className="font-display text-2xl font-semibold tracking-widest text-ekam-cream">EKAM</span>
@@ -63,11 +62,11 @@ export default function Footer() {
             <p className="text-sm text-ekam-muted leading-relaxed mb-6">
               Ekam is a premium platform dedicated to preserving and sharing India&apos;s rich cultural heritage through expert-led courses in classical arts, music, dance, and philosophy.
             </p>
-            <div className="flex items-center gap-1 text-xs text-ekam-muted mb-2">
+            <div className="flex items-center gap-1.5 text-xs text-ekam-muted mb-2">
               <Mail size={13} className="text-ekam-gold" />
               <span>contact@ekam.in</span>
             </div>
-            <div className="flex items-center gap-1 text-xs text-ekam-muted">
+            <div className="flex items-center gap-1.5 text-xs text-ekam-muted">
               <Phone size={13} className="text-ekam-gold" />
               <span>+91 98765 43210</span>
             </div>
@@ -76,26 +75,17 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <p className="text-sm font-medium text-ekam-cream mb-3">Join 85,000+ learners — get curated cultural content</p>
             <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="input-field flex-1"
-              />
+              <input type="email" placeholder="Enter your email address" className="input-field flex-1" />
               <button className="btn-gold whitespace-nowrap">Subscribe</button>
             </div>
-            <p className="text-xs text-ekam-muted mt-2">No spam. Unsubscribe anytime. New courses every week.</p>
+            <p className="text-xs text-ekam-muted mt-2">No spam. Unsubscribe anytime.</p>
 
-            {/* Social links */}
             <div className="flex items-center gap-3 mt-6">
               <span className="text-xs text-ekam-muted tracking-wide">Follow us:</span>
               {socials.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-ekam-muted hover:text-ekam-gold hover:border-ekam-gold/40 transition-all duration-200"
-                  style={{ border: '1px solid #2E2215' }}
-                >
+                <a key={label} href={href} aria-label={label}
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-ekam-muted hover:text-ekam-gold hover:bg-white transition-all duration-200"
+                  style={{ border: '1px solid #E2D5C4' }}>
                   <Icon size={15} />
                 </a>
               ))}
@@ -103,7 +93,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Decorative divider */}
         <div className="divider-gold mb-12">
           <span className="px-4 text-ekam-gold text-sm">✦</span>
         </div>
@@ -118,10 +107,7 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map(link => (
                   <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-ekam-muted hover:text-ekam-cream-dim transition-colors duration-200"
-                    >
+                    <Link href={link.href} className="text-sm text-ekam-muted hover:text-ekam-cream transition-colors duration-200">
                       {link.label}
                     </Link>
                   </li>
@@ -132,7 +118,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-6 border-t border-ekam-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #E2D5C4' }}>
           <p className="text-xs text-ekam-muted text-center md:text-left">
             © {new Date().getFullYear()} Ekam Learning Pvt. Ltd. All rights reserved.
           </p>
@@ -140,11 +126,11 @@ export default function Footer() {
             <span className="text-xs text-ekam-muted tracking-widest">Made with ❤️ for Bharat</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-xs text-ekam-muted hover:text-ekam-cream-dim transition-colors">Privacy</Link>
+            <Link href="/privacy" className="text-xs text-ekam-muted hover:text-ekam-cream transition-colors">Privacy</Link>
             <span className="text-ekam-border">•</span>
-            <Link href="/terms" className="text-xs text-ekam-muted hover:text-ekam-cream-dim transition-colors">Terms</Link>
+            <Link href="/terms" className="text-xs text-ekam-muted hover:text-ekam-cream transition-colors">Terms</Link>
             <span className="text-ekam-border">•</span>
-            <Link href="/sitemap" className="text-xs text-ekam-muted hover:text-ekam-cream-dim transition-colors">Sitemap</Link>
+            <Link href="/sitemap" className="text-xs text-ekam-muted hover:text-ekam-cream transition-colors">Sitemap</Link>
           </div>
         </div>
       </div>

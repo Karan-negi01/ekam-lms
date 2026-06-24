@@ -183,19 +183,19 @@ export default function DashboardPage() {
   ]
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#080604' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
 
   return (
-    <div className="min-h-screen pt-16 flex" style={{ background: '#080604' }}>
+    <div className="min-h-screen pt-16 flex" style={{ background: '#FDFAF4' }}>
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ekam-border pt-8 pb-6 px-4 flex-shrink-0"
-        style={{ background: '#0A0805', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
+        style={{ background: '#F5EFE4', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
         {/* User info */}
         <div className="flex items-center gap-3 px-2 mb-8 pb-6 border-b border-ekam-border">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-ekam-bg"
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
             style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
             {user.name?.charAt(0)}
           </div>
@@ -347,10 +347,10 @@ export default function DashboardPage() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl"
-            style={{ background: '#1C1510', border: '1px solid #2E2215' }}>
+            style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-ekam-border sticky top-0 z-10"
-              style={{ background: '#1C1510' }}>
+              style={{ background: '#FFFFFF' }}>
               <div>
                 <h2 className="font-serif text-xl text-ekam-cream">
                   {editingCourse ? 'Edit Course' : 'Create New Course'}
@@ -374,7 +374,7 @@ export default function DashboardPage() {
                     }`}
                   >
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                      formStep === i + 1 ? 'bg-ekam-gold text-ekam-bg' : formStep > i + 1 ? 'bg-green-700 text-white' : 'bg-ekam-border text-ekam-muted'
+                      formStep === i + 1 ? 'bg-ekam-gold text-white' : formStep > i + 1 ? 'bg-green-700 text-white' : 'bg-ekam-border text-ekam-muted'
                     }`}>
                       {formStep > i + 1 ? '✓' : i + 1}
                     </div>
@@ -466,7 +466,7 @@ export default function DashboardPage() {
 
                   {courseForm.sections.map((section, sIdx) => (
                     <div key={sIdx} className="rounded-xl overflow-hidden"
-                      style={{ background: '#15100A', border: '1px solid #2E2215' }}>
+                      style={{ background: '#FAFAF4', border: '1px solid #E2D5C4' }}>
                       <div className="flex items-center gap-3 p-4 border-b border-ekam-border">
                         <span className="text-xs font-bold text-ekam-gold bg-ekam-gold/15 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">
                           {sIdx + 1}
@@ -488,7 +488,7 @@ export default function DashboardPage() {
                       <div className="p-3 space-y-2">
                         {section.lessons.map((lesson, lIdx) => (
                           <div key={lIdx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg"
-                            style={{ background: '#1C1510' }}>
+                            style={{ background: '#FFFFFF' }}>
                             <input
                               type="text"
                               value={lesson.title}
@@ -550,11 +550,11 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Preview */}
-                  <div className="rounded-xl p-5" style={{ background: '#15100A', border: '1px solid #2E2215' }}>
+                  <div className="rounded-xl p-5" style={{ background: '#FAFAF4', border: '1px solid #E2D5C4' }}>
                     <p className="text-xs text-ekam-muted uppercase tracking-wide mb-4">Course Preview</p>
                     <div className="flex items-start gap-4">
                       <div className="w-16 h-12 rounded-lg flex items-center justify-center text-3xl"
-                        style={{ background: 'linear-gradient(135deg, #1C1510, #2E2215)' }}>
+                        style={{ background: 'linear-gradient(135deg, #F5EFE4, #EDE4D8)' }}>
                         {courseForm.thumbnailEmoji}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -634,7 +634,7 @@ function CourseRow({ course, onEdit, onDelete }) {
   return (
     <div className="card-base p-4 flex items-center gap-4">
       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-        style={{ background: '#15100A' }}>
+        style={{ background: '#FAFAF4' }}>
         {course.thumbnailEmoji}
       </div>
       <div className="flex-1 min-w-0">

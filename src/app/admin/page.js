@@ -89,18 +89,18 @@ export default function AdminPage() {
   )
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#080604' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
 
   return (
-    <div className="min-h-screen pt-16 flex" style={{ background: '#080604' }}>
+    <div className="min-h-screen pt-16 flex" style={{ background: '#FDFAF4' }}>
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ekam-border pt-8 pb-6 px-4 flex-shrink-0"
-        style={{ background: '#0A0805', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
+        style={{ background: '#F5EFE4', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
         <div className="flex items-center gap-3 px-2 mb-8 pb-6 border-b border-ekam-border">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-ekam-bg"
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
             style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
             {user.name?.charAt(0)}
           </div>
@@ -122,7 +122,7 @@ export default function AdminPage() {
               <Icon size={16} />
               {label}
               {id === 'approvals' && pendingCourses.length > 0 && (
-                <span className="ml-auto w-5 h-5 rounded-full bg-ekam-saffron text-ekam-bg text-[10px] font-bold flex items-center justify-center">
+                <span className="ml-auto w-5 h-5 rounded-full bg-ekam-saffron text-white text-[10px] font-bold flex items-center justify-center">
                   {pendingCourses.length}
                 </span>
               )}
@@ -202,9 +202,9 @@ export default function AdminPage() {
             {/* Platform Courses */}
             <div>
               <h2 className="font-serif text-xl text-ekam-cream mb-4">Platform Courses</h2>
-              <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #2E2215' }}>
+              <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
                 <table className="table-ekam">
-                  <thead style={{ background: '#15100A' }}>
+                  <thead style={{ background: '#FAFAF4' }}>
                     <tr>
                       <th>Course</th>
                       <th>Instructor</th>
@@ -214,7 +214,7 @@ export default function AdminPage() {
                       <th>Price</th>
                     </tr>
                   </thead>
-                  <tbody style={{ background: '#1C1510' }}>
+                  <tbody style={{ background: '#FFFFFF' }}>
                     {allCourses.slice(0, 6).map(course => (
                       <tr key={course.id}>
                         <td>
@@ -258,9 +258,9 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #2E2215' }}>
+            <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
               <table className="table-ekam">
-                <thead style={{ background: '#15100A' }}>
+                <thead style={{ background: '#FAFAF4' }}>
                   <tr>
                     <th>Course</th>
                     <th>Instructor</th>
@@ -271,7 +271,7 @@ export default function AdminPage() {
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody style={{ background: '#1C1510' }}>
+                <tbody style={{ background: '#FFFFFF' }}>
                   {filteredCourses.map(course => {
                     const sc = {
                       published: { bg: 'rgba(76,175,114,0.1)', text: '#4CAF72' },
@@ -329,9 +329,9 @@ export default function AdminPage() {
         {section === 'instructors' && (
           <div>
             <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-6">Instructors</h1>
-            <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #2E2215' }}>
+            <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
               <table className="table-ekam">
-                <thead style={{ background: '#15100A' }}>
+                <thead style={{ background: '#FAFAF4' }}>
                   <tr>
                     <th>Instructor</th>
                     <th>Category</th>
@@ -341,12 +341,12 @@ export default function AdminPage() {
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody style={{ background: '#1C1510' }}>
+                <tbody style={{ background: '#FFFFFF' }}>
                   {instructors.map(inst => (
                     <tr key={inst.id}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-ekam-bg"
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
                             style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
                             {inst.initials}
                           </div>
@@ -445,7 +445,7 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false }) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 flex-1 min-w-0">
           <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl flex-shrink-0"
-            style={{ background: '#15100A' }}>
+            style={{ background: '#FAFAF4' }}>
             {course.thumbnailEmoji}
           </div>
           <div className="flex-1 min-w-0">

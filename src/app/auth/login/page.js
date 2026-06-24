@@ -24,26 +24,16 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     await new Promise(r => setTimeout(r, 800))
-
-    // Mock auth — check if admin
     const isAdmin = form.email.toLowerCase().includes('admin')
     const isInstructor = form.email.toLowerCase().includes('instructor') || form.email.toLowerCase().includes('teacher')
-
-    if (!form.email || !form.password) {
-      setError('Please fill in all fields.')
-      setLoading(false)
-      return
-    }
-
+    if (!form.email || !form.password) { setError('Please fill in all fields.'); setLoading(false); return }
     const user = {
       id: 'user-' + Date.now(),
       name: form.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       email: form.email,
       role: isAdmin ? 'admin' : isInstructor ? 'instructor' : 'student',
     }
-
     localStorage.setItem('ekam_user', JSON.stringify(user))
     setLoading(false)
     router.push(redirect)
@@ -62,47 +52,41 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pt-16 cultural-bg"
-      style={{ background: '#080604' }}>
-      {/* Background glow */}
+      style={{ background: 'linear-gradient(160deg, #FDFAF4 0%, #F5EFE4 100%)' }}>
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(212,168,67,0.05) 0%, transparent 70%)' }} />
+        style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(140,98,16,0.05) 0%, transparent 70%)' }} />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-2">
             <div className="w-14 h-14 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)', boxShadow: '0 0 30px rgba(212,168,67,0.3)' }}>
-              <span className="font-display font-bold text-3xl text-ekam-bg">ए</span>
+              style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)', boxShadow: '0 0 28px rgba(140,98,16,0.25)' }}>
+              <span className="font-display font-bold text-3xl text-white">ए</span>
             </div>
             <div>
-              <p className="font-display text-2xl font-semibold tracking-widest text-ekam-cream">EKAM</p>
-              <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-70">एकम्</p>
+              <p className="font-display text-2xl font-semibold tracking-widest" style={{ color: '#1C0E04' }}>EKAM</p>
+              <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-75">एकम्</p>
             </div>
           </Link>
-          <h1 className="font-serif text-2xl text-ekam-cream mt-6 mb-1">Welcome Back</h1>
-          <p className="text-sm text-ekam-muted">Sign in to continue your learning journey</p>
+          <h1 className="font-serif text-2xl mt-6 mb-1" style={{ color: '#1C0E04' }}>Welcome Back</h1>
+          <p className="text-sm" style={{ color: '#7A6550' }}>Sign in to continue your learning journey</p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl p-6 md:p-8"
-          style={{ background: '#1C1510', border: '1px solid #2E2215', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+        <div className="rounded-2xl p-6 md:p-8 bg-white"
+          style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 40px rgba(139,94,10,0.10)' }}>
 
           {/* Demo logins */}
           <div className="mb-6">
-            <p className="text-xs text-ekam-muted text-center mb-3 tracking-wide">Quick Demo Access</p>
+            <p className="text-xs text-center mb-3 tracking-wide" style={{ color: '#7A6550' }}>Quick Demo Access</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { role: 'student', label: 'Student', color: 'rgba(212,168,67,0.1)', border: 'rgba(212,168,67,0.25)', text: '#D4A843' },
-                { role: 'instructor', label: 'Instructor', color: 'rgba(232,98,42,0.1)', border: 'rgba(232,98,42,0.25)', text: '#E8622A' },
-                { role: 'admin', label: 'Admin', color: 'rgba(139,32,32,0.15)', border: 'rgba(139,32,32,0.4)', text: '#E05555' },
-              ].map(({ role, label, color, border, text }) => (
-                <button
-                  key={role}
-                  onClick={() => demoLogin(role)}
+                { role: 'student', label: 'Student', bg: 'rgba(140,98,16,0.07)', border: 'rgba(140,98,16,0.22)', text: '#8C6210' },
+                { role: 'instructor', label: 'Instructor', bg: 'rgba(196,64,21,0.07)', border: 'rgba(196,64,21,0.22)', text: '#C44015' },
+                { role: 'admin', label: 'Admin', bg: 'rgba(176,24,24,0.07)', border: 'rgba(176,24,24,0.22)', text: '#B01818' },
+              ].map(({ role, label, bg, border, text }) => (
+                <button key={role} onClick={() => demoLogin(role)}
                   className="px-2 py-2 rounded-lg text-xs font-medium transition-all hover:scale-105"
-                  style={{ background: color, border: `1px solid ${border}`, color: text }}
-                >
+                  style={{ background: bg, border: `1px solid ${border}`, color: text }}>
                   {label}
                 </button>
               ))}
@@ -110,78 +94,55 @@ function LoginForm() {
           </div>
 
           <div className="divider-gold mb-6">
-            <span className="px-3 text-xs text-ekam-muted">or sign in manually</span>
+            <span className="px-3 text-xs" style={{ color: '#7A6550' }}>or sign in manually</span>
           </div>
 
           {error && (
-            <div className="mb-4 px-4 py-3 rounded-lg text-xs text-red-300"
-              style={{ background: 'rgba(139,32,32,0.2)', border: '1px solid rgba(139,32,32,0.4)' }}>
+            <div className="mb-4 px-4 py-3 rounded-lg text-xs text-red-600"
+              style={{ background: 'rgba(176,24,24,0.06)', border: '1px solid rgba(176,24,24,0.2)' }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Email Address</label>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: '#3D2814' }}>Email Address</label>
               <div className="relative">
                 <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ekam-muted" />
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="input-field pl-10"
-                  required
-                />
+                <input type="email" name="email" value={form.email} onChange={handleChange}
+                  placeholder="you@example.com" className="input-field pl-10" required />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-medium text-ekam-cream-dim">Password</label>
+                <label className="text-xs font-medium" style={{ color: '#3D2814' }}>Password</label>
                 <Link href="/auth/forgot-password" className="text-xs text-ekam-gold hover:text-ekam-gold-light transition-colors">
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ekam-muted" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  className="input-field pl-10 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ekam-muted hover:text-ekam-cream transition-colors"
-                >
+                <input type={showPassword ? 'text' : 'password'} name="password" value={form.password}
+                  onChange={handleChange} placeholder="Enter your password" className="input-field pl-10 pr-10" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ekam-muted hover:text-ekam-cream transition-colors">
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-gold w-full justify-center py-3.5 text-base rounded-xl mt-2 disabled:opacity-60"
-            >
+            <button type="submit" disabled={loading}
+              className="btn-gold w-full justify-center py-3.5 text-base rounded-xl mt-2 disabled:opacity-60">
               {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="loader-gold w-4 h-4" />
-                  Signing in...
-                </div>
+                <div className="flex items-center gap-2"><div className="loader-gold w-4 h-4" /> Signing in...</div>
               ) : (
                 <>Sign In <ArrowRight size={16} /></>
               )}
             </button>
           </form>
 
-          <p className="text-center text-sm text-ekam-muted mt-5">
+          <p className="text-center text-sm mt-5" style={{ color: '#7A6550' }}>
             New to Ekam?{' '}
             <Link href="/auth/signup" className="text-ekam-gold hover:text-ekam-gold-light font-medium transition-colors">
               Create an account
@@ -189,7 +150,7 @@ function LoginForm() {
           </p>
         </div>
 
-        <p className="text-center text-xs text-ekam-muted mt-6">
+        <p className="text-center text-xs mt-6" style={{ color: '#7A6550' }}>
           By signing in, you agree to Ekam&apos;s{' '}
           <Link href="/terms" className="text-ekam-gold hover:text-ekam-gold-light transition-colors">Terms</Link>
           {' '}and{' '}
@@ -202,7 +163,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#080604' }}><div className="loader-gold w-8 h-8" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}><div className="loader-gold w-8 h-8" /></div>}>
       <LoginForm />
     </Suspense>
   )

@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="min-h-screen flex flex-col" style={{ background: '#080604' }}>
+      <body className="min-h-screen flex flex-col" style={{ background: '#FDFAF4' }}>
         <Header />
         <main className="flex-1">
           {children}

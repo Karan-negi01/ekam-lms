@@ -41,7 +41,7 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#080604' }}>
+      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FDFAF4' }}>
         <div className="text-center">
           <div className="text-5xl mb-4">📚</div>
           <h2 className="font-serif text-2xl text-ekam-cream mb-2">Course not found</h2>
@@ -85,7 +85,7 @@ export default function CourseDetailPage() {
 
   const PriceCard = ({ compact = false }) => (
     <div className={`rounded-2xl overflow-hidden ${compact ? '' : 'shadow-card'}`}
-      style={{ background: '#1C1510', border: '1px solid #2E2215' }}>
+      style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
       {currentLesson && enrolled ? (
         <div className="p-6">
           <div className="video-container rounded-xl overflow-hidden mb-4">
@@ -177,9 +177,9 @@ export default function CourseDetailPage() {
   )
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: '#080604' }}>
+    <div className="min-h-screen pt-16" style={{ background: '#FDFAF4' }}>
       {/* Hero Banner */}
-      <div style={{ background: 'linear-gradient(to bottom, #12080A, #080604)', borderBottom: '1px solid #1C1510' }}>
+      <div style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <Link href="/courses" className="inline-flex items-center gap-1.5 text-xs text-ekam-muted hover:text-ekam-cream mb-6 transition-colors">
             <ArrowLeft size={14} /> Back to Courses
@@ -222,8 +222,8 @@ export default function CourseDetailPage() {
 
               {/* Instructor */}
               <div className="flex items-center gap-3 p-4 rounded-xl"
-                style={{ background: '#1C1510', border: '1px solid #2E2215' }}>
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-ekam-bg"
+                style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white"
                   style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
                   {course.instructor?.initials}
                 </div>
@@ -253,7 +253,7 @@ export default function CourseDetailPage() {
       {/* Sticky mobile price bar */}
       {stickyVisible && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-4 glass"
-          style={{ borderTop: '1px solid #2E2215' }}>
+          style={{ borderTop: '1px solid #E2D5C4' }}>
           <div className="flex items-center justify-between gap-3">
             <div>
               <span className="text-xl font-semibold text-ekam-gold">{formatPrice(course.price)}</span>
@@ -272,7 +272,7 @@ export default function CourseDetailPage() {
           <div className="lg:col-span-2">
             {/* Tabs */}
             <div className="flex gap-1 mb-8 overflow-x-auto scrollbar-hide"
-              style={{ borderBottom: '1px solid #2E2215' }}>
+              style={{ borderBottom: '1px solid #E2D5C4' }}>
               {[
                 ['curriculum', 'Curriculum'],
                 ['overview', 'Overview'],
@@ -304,7 +304,7 @@ export default function CourseDetailPage() {
                 <div className="space-y-3">
                   {course.curriculum?.map((section, i) => (
                     <div key={i} className="rounded-xl overflow-hidden"
-                      style={{ background: '#1C1510', border: '1px solid #2E2215' }}>
+                      style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
                       <button
                         onClick={() => toggleSection(i)}
                         className="w-full flex items-center justify-between p-4 hover:bg-ekam-gold/5 transition-all"
@@ -338,7 +338,7 @@ export default function CourseDetailPage() {
                               }`}
                             >
                               <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ background: lesson.free || enrolled ? 'rgba(212,168,67,0.15)' : 'rgba(46,34,21,0.8)' }}>
+                                style={{ background: lesson.free || enrolled ? 'rgba(212,168,67,0.15)' : 'rgba(226,213,196,0.8)' }}>
                                 {lesson.free || enrolled
                                   ? <Play size={10} className="text-ekam-gold fill-ekam-gold ml-0.5" />
                                   : <Lock size={10} className="text-ekam-muted" />
@@ -406,7 +406,7 @@ export default function CourseDetailPage() {
               <div>
                 <h2 className="font-serif text-xl text-ekam-cream mb-6">About Your Instructor</h2>
                 <div className="flex items-start gap-5 mb-6">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold text-ekam-bg flex-shrink-0"
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
                     style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
                     {course.instructor?.initials}
                   </div>
@@ -434,7 +434,7 @@ export default function CourseDetailPage() {
               <div>
                 <h2 className="font-serif text-xl text-ekam-cream mb-6">Student Reviews</h2>
                 <div className="flex items-center gap-8 p-6 rounded-xl mb-6"
-                  style={{ background: '#1C1510', border: '1px solid #2E2215' }}>
+                  style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
                   <div className="text-center">
                     <div className="text-5xl font-semibold text-ekam-gold mb-1">{course.rating}</div>
                     <div className="flex gap-0.5 justify-center mb-1">
