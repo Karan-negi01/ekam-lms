@@ -98,7 +98,7 @@ export default function HomePage() {
 
             {/* LEFT */}
             <div className="animate-fadeUp">
-              <span className="section-label mb-6 block">India's Premier Cultural Platform</span>
+              <span className="section-label mb-6 block">India&apos;s Premier Cultural Platform</span>
 
               <p className="font-display text-ekam-gold text-base tracking-[0.3em] mb-4 opacity-80">
                 ॥ विद्या विनयेन शोभते ॥
@@ -117,7 +117,7 @@ export default function HomePage() {
               </h1>
 
               <p className="text-base leading-relaxed mb-8 max-w-lg" style={{ color: '#6B5744', lineHeight: '1.75' }}>
-                Learn from India's most celebrated maestros — classical music, Bharatanatyam, Ashtanga Yoga, Sanskrit, Madhubani art and Vedic wisdom. All in one place.
+                Learn from India&apos;s most celebrated maestros — classical music, Bharatanatyam, Ashtanga Yoga, Sanskrit, Madhubani art and Vedic wisdom. All in one place.
               </p>
 
               {/* CTAs */}
@@ -431,7 +431,7 @@ export default function HomePage() {
                 {/* Big quote mark */}
                 <div className="font-serif text-7xl leading-none mb-4 select-none"
                   style={{ color: idx === 1 ? 'rgba(196,136,26,0.25)' : 'rgba(140,98,16,0.10)', lineHeight: '0.8' }}>
-                  "
+                  &ldquo;
                 </div>
 
                 <div className="flex items-center gap-1 mb-4">
@@ -482,7 +482,7 @@ export default function HomePage() {
             <span style={{ color: '#D4A843' }}>Learning Journey</span>
           </h2>
           <p className="mb-8 text-base" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Join 85,000+ students discovering the depth of India's artistic traditions. Start free, learn forever.
+            Join 85,000+ students discovering the depth of India&apos;s artistic traditions. Start free, learn forever.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="btn-gold text-base px-8 py-4 rounded-2xl">
