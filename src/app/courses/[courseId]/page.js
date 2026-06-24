@@ -21,6 +21,7 @@ export default function CourseDetailPage() {
   const [user, setUser] = useState(null)
   const [currentLesson, setCurrentLesson] = useState(null)
   const [stickyVisible, setStickyVisible] = useState(false)
+  const [completedLessons, setCompletedLessons] = useState([])
 
   const course = courses.find(c => c.id === courseId)
 
@@ -33,6 +34,9 @@ export default function CourseDetailPage() {
 
     const wishlistItems = JSON.parse(localStorage.getItem('ekam_wishlist') || '[]')
     setWishlist(wishlistItems.includes(courseId))
+
+    const completed = JSON.parse(localStorage.getItem(`ekam_progress_${courseId}`) || '[]')
+    setCompletedLessons(completed)
 
     const handleScroll = () => setStickyVisible(window.scrollY > 400)
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -53,7 +57,7 @@ export default function CourseDetailPage() {
   }
 
   const discount = getDiscount(course.originalPrice, course.price)
-  const totalLessons = course.curriculum?.reduce((acc, sec) => acc + sec.lessons.length, 0) || 0
+  const totalLessons = course?.curriculum?.reduce((acc, sec) => acc + sec.lessons.length, 0) || 0
 
   const handleEnroll = () => {
     if (!user) {
@@ -82,6 +86,22 @@ export default function CourseDetailPage() {
       prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
     )
   }
+
+  const openLesson = (lesson) => {
+    setCurrentLesson(lesson)
+    // Mark lesson as completed when opened
+    if (enrolled) {
+      setCompletedLessons(prev => {
+        if (prev.includes(lesson.id)) return prev
+        const updated = [...prev, lesson.id]
+        localStorage.setItem(`ekam_progress_${courseId}`, JSON.stringify(updated))
+        return updated
+      })
+    }
+  }
+
+  const totalLessonsCount = course?.curriculum?.reduce((a, s) => a + s.lessons.length, 0) || 0
+  const progressPct = totalLessonsCount > 0 ? Math.round((completedLessons.length / totalLessonsCount) * 100) : 0
 
   const PriceCard = ({ compact = false }) => (
     <div className={`rounded-2xl overflow-hidden ${compact ? '' : 'shadow-card'}`}
@@ -125,7 +145,7 @@ export default function CourseDetailPage() {
 
         {enrolled ? (
           <button
-            onClick={() => setCurrentLesson(course.curriculum?.[0]?.lessons?.[0])}
+            onClick={() => openLesson(course.curriculum?.[0]?.lessons?.[0])}
             className="btn-gold w-full justify-center mb-3 py-3.5 text-base rounded-xl"
           >
             <Play size={16} /> Continue Learning
@@ -296,10 +316,37 @@ export default function CourseDetailPage() {
             {/* Curriculum Tab */}
             {activeTab === 'curriculum' && (
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-serif text-xl text-ekam-cream">Course Curriculum</h2>
-                  <span className="text-xs text-ekam-muted">{course.curriculum?.length} sections • {totalLessons} lessons • {course.duration}</span>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-serif text-xl" style={{ color: '#1C0E04' }}>Course Curriculum</h2>
+                  <span className="text-xs text-ekam-muted">{course.curriculum?.length} sections • {totalLessonsCount} lessons • {course.duration}</span>
                 </div>
+
+                {/* Progress bar (only if enrolled) */}
+                {enrolled && (
+                  <div className="rounded-xl p-4 mb-5 flex items-center gap-4"
+                    style={{ background: 'rgba(140,98,16,0.05)', border: '1px solid rgba(140,98,16,0.15)' }}>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium" style={{ color: '#1C0E04' }}>Your Progress</span>
+                        <span className="text-xs font-semibold text-ekam-gold">{completedLessons.length}/{totalLessonsCount} lessons</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: '#EDE4D8' }}>
+                        <div className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${progressPct}%`,
+                            background: progressPct === 100 ? '#1A5C38' : 'linear-gradient(to right, #8C6210, #C4881A)'
+                          }} />
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className="text-2xl font-semibold font-serif" style={{ color: progressPct === 100 ? '#1A5C38' : '#8C6210' }}>
+                        {progressPct}%
+                      </span>
+                      <p className="text-[10px] text-ekam-muted">Complete</p>
+                    </div>
+                  </div>
+                )}
+
 
                 <div className="space-y-3">
                   {course.curriculum?.map((section, i) => (
@@ -325,36 +372,49 @@ export default function CourseDetailPage() {
                       </button>
 
                       {expandedSections.includes(i) && (
-                        <div className="border-t border-ekam-border">
-                          {section.lessons.map((lesson, j) => (
-                            <button
-                              key={lesson.id}
-                              onClick={() => {
-                                if (lesson.free || enrolled) setCurrentLesson(lesson)
-                                else handleEnroll()
-                              }}
-                              className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all ${
-                                currentLesson?.id === lesson.id ? 'bg-ekam-gold/10' : 'hover:bg-white/5'
-                              }`}
-                            >
-                              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ background: lesson.free || enrolled ? 'rgba(212,168,67,0.15)' : 'rgba(226,213,196,0.8)' }}>
-                                {lesson.free || enrolled
-                                  ? <Play size={10} className="text-ekam-gold fill-ekam-gold ml-0.5" />
-                                  : <Lock size={10} className="text-ekam-muted" />
-                                }
-                              </div>
-                              <div className="flex-1 text-left">
-                                <p className={`text-xs font-medium ${currentLesson?.id === lesson.id ? 'text-ekam-gold' : 'text-ekam-cream-dim'}`}>
-                                  {lesson.title}
-                                </p>
-                                {lesson.free && !enrolled && (
-                                  <span className="text-[10px] text-ekam-gold">Free preview</span>
-                                )}
-                              </div>
-                              <span className="text-xs text-ekam-muted flex-shrink-0">{lesson.duration}</span>
-                            </button>
-                          ))}
+                        <div style={{ borderTop: '1px solid #EDE4D8' }}>
+                          {section.lessons.map((lesson, j) => {
+                            const isCompleted = completedLessons.includes(lesson.id)
+                            const isActive = currentLesson?.id === lesson.id
+                            const canAccess = lesson.free || enrolled
+                            return (
+                              <button
+                                key={lesson.id}
+                                onClick={() => canAccess ? openLesson(lesson) : handleEnroll()}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
+                                style={{ background: isActive ? 'rgba(140,98,16,0.06)' : 'transparent' }}
+                              >
+                                {/* Icon: completed / playing / locked */}
+                                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{
+                                    background: isCompleted ? 'rgba(26,92,56,0.12)'
+                                      : canAccess ? 'rgba(140,98,16,0.10)'
+                                      : '#EDE4D8'
+                                  }}>
+                                  {isCompleted
+                                    ? <CheckCircle2 size={13} style={{ color: '#1A5C38' }} />
+                                    : canAccess
+                                      ? <Play size={10} className="ml-0.5" style={{ color: '#8C6210', fill: '#8C6210' }} />
+                                      : <Lock size={10} className="text-ekam-muted" />
+                                  }
+                                </div>
+
+                                <div className="flex-1 text-left min-w-0">
+                                  <p className="text-xs font-medium truncate"
+                                    style={{ color: isActive ? '#8C6210' : isCompleted ? '#1A5C38' : '#3D2814' }}>
+                                    {lesson.title}
+                                  </p>
+                                  {lesson.free && !enrolled && (
+                                    <span className="text-[10px] text-ekam-gold">Free preview</span>
+                                  )}
+                                </div>
+
+                                <span className="text-xs flex-shrink-0" style={{ color: '#7A6550' }}>
+                                  {lesson.duration}
+                                </span>
+                              </button>
+                            )
+                          })}
                         </div>
                       )}
                     </div>
