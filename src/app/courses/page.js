@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Search, SlidersHorizontal, X, ChevronDown, Grid3X3, List } from 'lucide-react'
 import CourseCard from '@/components/courses/CourseCard'
-import { courses, categories } from '@/lib/data'
-import { formatNumber } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
+import { Mandala, PatternDots } from '@/components/decor/Decorative'
+import { courses as staticCourses, categories } from '@/lib/data'
+import { formatNumber, getPublishedUserCourses } from '@/lib/utils'
 
 const levels = ['All Levels', 'Beginner', 'Intermediate', 'Advanced', 'Beginner to Intermediate', 'Beginner to Advanced']
 const sortOptions = [
@@ -23,6 +25,11 @@ export default function CoursesPage() {
   const [viewMode, setViewMode] = useState('grid')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [priceFilter, setPriceFilter] = useState('all')
+  const [courses, setCourses] = useState(staticCourses)
+
+  useEffect(() => {
+    setCourses([...staticCourses, ...getPublishedUserCourses()])
+  }, [])
 
   const filtered = useMemo(() => {
     let result = [...courses]
@@ -47,7 +54,7 @@ export default function CoursesPage() {
       default: result.sort((a, b) => b.studentCount - a.studentCount)
     }
     return result
-  }, [searchQuery, selectedCategory, selectedLevel, sortBy, priceFilter])
+  }, [courses, searchQuery, selectedCategory, selectedLevel, sortBy, priceFilter])
 
   const activeFiltersCount = [
     selectedCategory !== 'all',
@@ -63,8 +70,10 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen pt-20" style={{ background: '#FDFAF4' }}>
       {/* Header */}
-      <div style={{ background: '#F5EFE4', borderBottom: '1px solid #E2D5C4' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <div className="relative overflow-hidden" style={{ background: '#F5EFE4', borderBottom: '1px solid #E2D5C4' }}>
+        <PatternDots />
+        <Mandala className="absolute -right-24 -top-20 w-72 h-72 opacity-40 pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-px h-4 bg-ekam-gold" />
@@ -147,7 +156,10 @@ export default function CoursesPage() {
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${
                         selectedCategory === cat.id ? 'text-ekam-gold bg-ekam-surface' : 'text-ekam-muted hover:text-ekam-cream hover:bg-ekam-surface'
                       }`}>
-                      <span>{cat.icon ? `${cat.icon} ${cat.label}` : cat.label}</span>
+                      <span className="flex items-center gap-2">
+                        {cat.id !== 'all' && <CategoryIcon id={cat.id} size={15} />}
+                        {cat.label}
+                      </span>
                       {'count' in cat && <span className="text-xs text-ekam-muted">{cat.count}</span>}
                     </button>
                   ))}
@@ -204,14 +216,15 @@ export default function CoursesPage() {
           </button>
           {categories.map(cat => (
             <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
                 selectedCategory === cat.id ? 'text-white' : 'text-ekam-muted hover:text-ekam-cream'
               }`}
               style={{
                 background: selectedCategory === cat.id ? '#8C6210' : 'white',
                 border: '1.5px solid ' + (selectedCategory === cat.id ? '#8C6210' : '#E2D5C4')
               }}>
-              {cat.icon} {cat.label}
+              <CategoryIcon id={cat.id} size={13} />
+              {cat.label}
             </button>
           ))}
         </div>
@@ -240,7 +253,9 @@ export default function CoursesPage() {
           </div>
         ) : (
           <div className="text-center py-24">
-            <div className="text-5xl mb-4">🔍</div>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
+              <Search size={24} className="text-ekam-gold" />
+            </div>
             <h3 className="font-serif text-xl mb-2" style={{ color: '#1C0E04' }}>No courses found</h3>
             <p className="mb-6" style={{ color: '#7A6550' }}>Try adjusting your search or filters</p>
             <button onClick={clearFilters} className="btn-outline">Clear All Filters</button>

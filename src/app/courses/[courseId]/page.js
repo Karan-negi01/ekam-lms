@@ -6,10 +6,12 @@ import Link from 'next/link'
 import {
   Star, Clock, Users, BookOpen, Globe, Award, ChevronDown, ChevronUp,
   Play, Lock, CheckCircle2, ArrowLeft, Share2, Heart, BadgeCheck,
-  Zap
+  Zap, ListTree, Info, GraduationCap, MessageSquare, FileText, Download
 } from 'lucide-react'
-import { courses } from '@/lib/data'
-import { formatPrice, formatNumber, getDiscount } from '@/lib/utils'
+import { courses as staticCourses } from '@/lib/data'
+import { formatPrice, formatNumber, getDiscount, getPublishedUserCourses } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
+import { Mandala, PatternDots } from '@/components/decor/Decorative'
 
 export default function CourseDetailPage() {
   const { courseId } = useParams()
@@ -22,10 +24,16 @@ export default function CourseDetailPage() {
   const [currentLesson, setCurrentLesson] = useState(null)
   const [stickyVisible, setStickyVisible] = useState(false)
   const [completedLessons, setCompletedLessons] = useState([])
-
-  const course = courses.find(c => c.id === courseId)
+  const [course, setCourse] = useState(() => staticCourses.find(c => c.id === courseId))
+  const [courseLoaded, setCourseLoaded] = useState(() => !!staticCourses.find(c => c.id === courseId))
 
   useEffect(() => {
+    if (!course) {
+      const found = getPublishedUserCourses().find(c => c.id === courseId)
+      setCourse(found || null)
+    }
+    setCourseLoaded(true)
+
     const stored = localStorage.getItem('ekam_user')
     if (stored) setUser(JSON.parse(stored))
 
@@ -41,13 +49,24 @@ export default function CourseDetailPage() {
     const handleScroll = () => setStickyVisible(window.scrollY > 400)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId])
+
+  if (!courseLoaded) {
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+        <div className="loader-gold w-8 h-8" />
+      </div>
+    )
+  }
 
   if (!course) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FDFAF4' }}>
         <div className="text-center">
-          <div className="text-5xl mb-4">📚</div>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
+            <BookOpen size={26} className="text-ekam-gold" />
+          </div>
           <h2 className="font-serif text-2xl text-ekam-cream mb-2">Course not found</h2>
           <p className="text-ekam-muted mb-6">This course doesn&apos;t exist or has been removed.</p>
           <Link href="/courses" className="btn-gold">Browse Courses</Link>
@@ -120,9 +139,9 @@ export default function CourseDetailPage() {
           <p className="text-xs text-ekam-muted">{currentLesson.duration}</p>
         </div>
       ) : (
-        <div className="relative" style={{ aspectRatio: '16/9', background: 'linear-gradient(135deg, #1a0f0a, #2e1a10)' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '16/9', background: 'linear-gradient(135deg, #1a0f0a, #2e1a10)' }}>
+          <CategoryIcon id={course.category} size={200} className="absolute inset-0 m-auto text-white opacity-[0.06]" />
           <div className="absolute inset-0 flex items-center justify-center flex-col gap-3">
-            <span className="text-5xl">{course.thumbnailEmoji}</span>
             <div className="w-14 h-14 rounded-full bg-ekam-gold/20 backdrop-blur-sm border border-ekam-gold/30 flex items-center justify-center cursor-pointer hover:bg-ekam-gold/30 transition-all">
               <Play size={20} className="text-ekam-gold fill-ekam-gold ml-1" />
             </div>
@@ -179,6 +198,9 @@ export default function CourseDetailPage() {
             [Globe, `Language: ${course.language}`],
             [Award, 'Certificate of completion'],
             [CheckCircle2, 'Lifetime access'],
+            ...(course.studyMaterialType && course.studyMaterialType !== 'none'
+              ? [[FileText, course.studyMaterialType === 'single' ? 'Downloadable study material (PDF)' : 'PDF study material per lesson']]
+              : []),
           ].map(([Icon, text], i) => (
             <div key={i} className="flex items-center gap-2.5 text-xs text-ekam-cream-dim">
               <Icon size={13} className="text-ekam-gold flex-shrink-0" />
@@ -186,6 +208,21 @@ export default function CourseDetailPage() {
             </div>
           ))}
         </div>
+
+        {course.studyMaterialType === 'single' && course.studyMaterialUrl && (
+          enrolled ? (
+            <a href={course.studyMaterialUrl} target="_blank" rel="noopener noreferrer"
+              className="mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
+              style={{ background: 'rgba(140,98,16,0.08)', border: '1px solid rgba(140,98,16,0.2)', color: '#8C6210' }}>
+              <Download size={14} /> Download Study Material
+            </a>
+          ) : (
+            <div className="mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm"
+              style={{ background: '#F5EFE4', color: '#9B8878' }}>
+              <Lock size={13} /> Study material unlocks after enrolling
+            </div>
+          )
+        )}
 
         <div className="mt-4 flex gap-2 justify-center">
           <button className="flex items-center gap-1.5 text-xs text-ekam-muted hover:text-ekam-cream transition-colors">
@@ -199,8 +236,10 @@ export default function CourseDetailPage() {
   return (
     <div className="min-h-screen pt-16" style={{ background: '#FDFAF4' }}>
       {/* Hero Banner */}
-      <div style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
+        <PatternDots />
+        <Mandala className="absolute -right-28 -top-24 w-80 h-80 opacity-30 pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <Link href="/courses" className="inline-flex items-center gap-1.5 text-xs text-ekam-muted hover:text-ekam-cream mb-6 transition-colors">
             <ArrowLeft size={14} /> Back to Courses
           </Link>
@@ -294,20 +333,21 @@ export default function CourseDetailPage() {
             <div className="flex gap-1 mb-8 overflow-x-auto scrollbar-hide"
               style={{ borderBottom: '1px solid #E2D5C4' }}>
               {[
-                ['curriculum', 'Curriculum'],
-                ['overview', 'Overview'],
-                ['instructor', 'Instructor'],
-                ['reviews', 'Reviews'],
-              ].map(([tab, label]) => (
+                ['curriculum', 'Curriculum', ListTree],
+                ['overview', 'Overview', Info],
+                ['instructor', 'Instructor', GraduationCap],
+                ['reviews', 'Reviews', MessageSquare],
+              ].map(([tab, label, Icon]) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 -mb-px ${
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 -mb-px ${
                     activeTab === tab
                       ? 'text-ekam-gold border-ekam-gold'
                       : 'text-ekam-muted border-transparent hover:text-ekam-cream hover:border-ekam-border'
                   }`}
                 >
+                  <Icon size={14} />
                   {label}
                 </button>
               ))}
@@ -378,41 +418,57 @@ export default function CourseDetailPage() {
                             const isActive = currentLesson?.id === lesson.id
                             const canAccess = lesson.free || enrolled
                             return (
-                              <button
-                                key={lesson.id}
-                                onClick={() => canAccess ? openLesson(lesson) : handleEnroll()}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
+                              <div key={lesson.id} className="w-full flex items-center gap-2 px-4 py-3 text-sm transition-all"
                                 style={{ background: isActive ? 'rgba(140,98,16,0.06)' : 'transparent' }}
                               >
-                                {/* Icon: completed / playing / locked */}
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                                  style={{
-                                    background: isCompleted ? 'rgba(26,92,56,0.12)'
-                                      : canAccess ? 'rgba(140,98,16,0.10)'
-                                      : '#EDE4D8'
-                                  }}>
-                                  {isCompleted
-                                    ? <CheckCircle2 size={13} style={{ color: '#1A5C38' }} />
-                                    : canAccess
-                                      ? <Play size={10} className="ml-0.5" style={{ color: '#8C6210', fill: '#8C6210' }} />
-                                      : <Lock size={10} className="text-ekam-muted" />
-                                  }
-                                </div>
+                                <button
+                                  onClick={() => canAccess ? openLesson(lesson) : handleEnroll()}
+                                  className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                                >
+                                  {/* Icon: completed / playing / locked */}
+                                  <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                    style={{
+                                      background: isCompleted ? 'rgba(26,92,56,0.12)'
+                                        : canAccess ? 'rgba(140,98,16,0.10)'
+                                        : '#EDE4D8'
+                                    }}>
+                                    {isCompleted
+                                      ? <CheckCircle2 size={13} style={{ color: '#1A5C38' }} />
+                                      : canAccess
+                                        ? <Play size={10} className="ml-0.5" style={{ color: '#8C6210', fill: '#8C6210' }} />
+                                        : <Lock size={10} className="text-ekam-muted" />
+                                    }
+                                  </div>
 
-                                <div className="flex-1 text-left min-w-0">
-                                  <p className="text-xs font-medium truncate"
-                                    style={{ color: isActive ? '#8C6210' : isCompleted ? '#1A5C38' : '#3D2814' }}>
-                                    {lesson.title}
-                                  </p>
-                                  {lesson.free && !enrolled && (
-                                    <span className="text-[10px] text-ekam-gold">Free preview</span>
-                                  )}
-                                </div>
+                                  <div className="flex-1 text-left min-w-0">
+                                    <p className="text-xs font-medium truncate"
+                                      style={{ color: isActive ? '#8C6210' : isCompleted ? '#1A5C38' : '#3D2814' }}>
+                                      {lesson.title}
+                                    </p>
+                                    {lesson.free && !enrolled && (
+                                      <span className="text-[10px] text-ekam-gold">Free preview</span>
+                                    )}
+                                  </div>
 
-                                <span className="text-xs flex-shrink-0" style={{ color: '#7A6550' }}>
-                                  {lesson.duration}
-                                </span>
-                              </button>
+                                  <span className="text-xs flex-shrink-0" style={{ color: '#7A6550' }}>
+                                    {lesson.duration}
+                                  </span>
+                                </button>
+
+                                {lesson.materialUrl && (
+                                  canAccess ? (
+                                    <a href={lesson.materialUrl} target="_blank" rel="noopener noreferrer"
+                                      title="Download lesson study material (PDF)"
+                                      className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-ekam-gold hover:bg-ekam-gold/10 transition-all">
+                                      <FileText size={13} />
+                                    </a>
+                                  ) : (
+                                    <span title="Study material unlocks after enrolling" className="flex-shrink-0 text-ekam-muted">
+                                      <FileText size={13} />
+                                    </span>
+                                  )
+                                )}
+                              </div>
                             )
                           })}
                         </div>

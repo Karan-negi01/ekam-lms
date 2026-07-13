@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Instagram, Youtube, Twitter, Facebook, Mail, Phone } from 'lucide-react'
 
 const footerLinks = {
@@ -49,15 +50,14 @@ export default function Footer() {
         {/* Brand & Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
           <div className="lg:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
-                <span className="text-white font-display font-bold text-xl">ए</span>
-              </div>
-              <div>
-                <span className="font-display text-2xl font-semibold tracking-widest text-ekam-cream">EKAM</span>
-                <p className="text-xs tracking-[0.25em] text-ekam-gold opacity-80">एकम् — One in Culture</p>
-              </div>
+            <Link href="/" className="inline-flex items-center mb-4">
+              <Image
+                src="/ekam-logo-crop.png"
+                alt="Ekam — One in Culture"
+                width={1056}
+                height={588}
+                className="h-12 w-auto rounded-lg"
+              />
             </Link>
             <p className="text-sm text-ekam-muted leading-relaxed mb-6">
               Ekam is a premium platform dedicated to preserving and sharing India&apos;s rich cultural heritage through expert-led courses in classical arts, music, dance, and philosophy.

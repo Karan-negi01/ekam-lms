@@ -1,218 +1,171 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Star, Play, ChevronRight, CheckCircle2, Users, BookOpen, Clock, Zap } from 'lucide-react'
+import { ArrowRight, Star, ChevronRight, ChevronDown, CheckCircle2, Users, BookOpen, GraduationCap, Globe, Search, PlayCircle, Award } from 'lucide-react'
 import CourseCard from '@/components/courses/CourseCard'
+import CategoryIcon from '@/components/icons/CategoryIcon'
+import { Mandala, PatternDots } from '@/components/decor/Decorative'
 import { courses, categories, instructors, stats, testimonials } from '@/lib/data'
-import { formatNumber, formatPrice } from '@/lib/utils'
+import { formatNumber, getPublishedUserCourses } from '@/lib/utils'
 
-/* ── Decorative SVGs ── */
-function Mandala({ className = '', opacity = 0.5 }) {
-  return (
-    <svg viewBox="0 0 300 300" className={className} fill="none">
-      {[130, 105, 80, 55, 30].map((r, i) => (
-        <circle key={i} cx="150" cy="150" r={r}
-          stroke={`rgba(140,98,16,${(0.06 - i * 0.01).toFixed(2)})`} strokeWidth="0.6" />
-      ))}
-      {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg, i) => (
-        <g key={i} transform={`rotate(${deg} 150 150)`}>
-          <line x1="150" y1="20" x2="150" y2="50" stroke="rgba(140,98,16,0.12)" strokeWidth="0.6"/>
-          <circle cx="150" cy="35" r="2.5" fill="rgba(140,98,16,0.10)"/>
-          <polygon points="150,60 147,72 153,72" fill="rgba(140,98,16,0.06)"/>
-        </g>
-      ))}
-      <circle cx="150" cy="150" r="10" fill="rgba(140,98,16,0.12)"/>
-      <circle cx="150" cy="150" r="5" fill="rgba(140,98,16,0.22)"/>
-    </svg>
-  )
+const statIcons = {
+  'Active Students': Users,
+  'Expert Instructors': GraduationCap,
+  'Courses Available': BookOpen,
+  'Languages': Globe,
 }
 
-function PatternDots() {
-  return (
-    <svg className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-          <circle cx="2" cy="2" r="1.5" fill="#8C6210"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#dots)"/>
-    </svg>
-  )
-}
+const faqs = [
+  {
+    q: 'Do I need any prior experience to start?',
+    a: 'Not at all. Every course is tagged by level — Beginner, Intermediate or Advanced — and most traditions offer a dedicated beginner track that starts from the very basics.',
+  },
+  {
+    q: 'Can I learn at my own pace?',
+    a: 'Yes. Once enrolled, you get lifetime access to watch, rewatch and revisit lessons whenever you like — there are no deadlines or live-class requirements.',
+  },
+  {
+    q: 'What languages are the courses available in?',
+    a: 'Most courses are taught in a mix of Hindi and English, with several also available in regional languages and Sanskrit depending on the tradition.',
+  },
+  {
+    q: 'How do I become an instructor on Ekam?',
+    a: 'Sign up with an instructor account, then create your course from your dashboard. Our team reviews every submission for authenticity before it goes live, usually within 48 hours.',
+  },
+  {
+    q: 'Is there a certificate after completion?',
+    a: 'Yes, every course awards a certificate of completion once you finish all lessons — recognized by the cultural institutions Ekam partners with.',
+  },
+]
 
-const categoryColors = {
-  music:   { bg: 'rgba(194,120,24,0.10)', icon: 'rgba(194,120,24,0.18)', border: 'rgba(194,120,24,0.20)', text: '#B06010', label: '#8C4A08' },
-  dance:   { bg: 'rgba(196,64,80,0.08)',  icon: 'rgba(196,64,80,0.16)',  border: 'rgba(196,64,80,0.18)',  text: '#C44050', label: '#9A2030' },
-  yoga:    { bg: 'rgba(26,120,56,0.08)',  icon: 'rgba(26,120,56,0.15)',  border: 'rgba(26,120,56,0.18)',  text: '#1A7838', label: '#0E5028' },
-  art:     { bg: 'rgba(200,100,20,0.08)', icon: 'rgba(200,100,20,0.16)', border: 'rgba(200,100,20,0.18)', text: '#C86414', label: '#9A4808' },
-  sanskrit:{ bg: 'rgba(80,60,160,0.07)',  icon: 'rgba(80,60,160,0.14)',  border: 'rgba(80,60,160,0.16)',  text: '#5038A0', label: '#382880' },
-  vedic:   { bg: 'rgba(180,130,20,0.08)', icon: 'rgba(180,130,20,0.16)', border: 'rgba(180,130,20,0.18)', text: '#B48214', label: '#8A6008' },
-  cooking: { bg: 'rgba(196,48,20,0.08)',  icon: 'rgba(196,48,20,0.14)',  border: 'rgba(196,48,20,0.16)',  text: '#C43014', label: '#9A1C08' },
-  craft:   { bg: 'rgba(120,72,30,0.08)',  icon: 'rgba(120,72,30,0.15)',  border: 'rgba(120,72,30,0.18)',  text: '#78481E', label: '#5A3010' },
-}
-
-/* ── Mini course card for hero ── */
-function HeroCourseChip({ course }) {
+function FaqItem({ item, isOpen, onToggle }) {
   return (
-    <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-[0_4px_20px_rgba(139,94,10,0.10)]"
-      style={{ border: '1px solid #EDE4D8' }}>
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-        style={{ background: 'linear-gradient(135deg, #451a03, #450a0a)' }}>
-        {course.thumbnailEmoji}
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs font-semibold truncate" style={{ color: '#1C0E04' }}>{course.title.split(':')[0]}</p>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <Star size={10} className="fill-amber-500 text-amber-500" />
-          <span className="text-[10px] font-medium text-amber-600">{course.rating}</span>
-          <span className="text-[10px]" style={{ color: '#B0A090' }}>· {formatNumber(course.studentCount)} students</span>
+    <div className="rounded-2xl overflow-hidden bg-white" style={{ border: '1px solid #EDE4D8' }}>
+      <button onClick={onToggle} className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left">
+        <span className="font-serif text-base font-medium" style={{ color: '#1C0E04' }}>{item.q}</span>
+        <ChevronDown size={16} className="text-ekam-gold flex-shrink-0 transition-transform duration-300"
+          style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-5 text-sm leading-relaxed" style={{ color: '#7A6550' }}>
+          {item.a}
         </div>
-      </div>
-      <div className="ml-auto flex-shrink-0">
-        <span className="text-xs font-bold" style={{ color: '#8C6210' }}>{formatPrice(course.price)}</span>
-      </div>
+      )}
     </div>
   )
 }
 
 export default function HomePage() {
   const featuredCourses = courses.filter(c => c.featured)
+  const [newInstructorCourses, setNewInstructorCourses] = useState([])
+  const [openFaq, setOpenFaq] = useState(0)
+
+  useEffect(() => {
+    const published = getPublishedUserCourses()
+    setNewInstructorCourses(
+      [...published].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4)
+    )
+  }, [])
 
   return (
     <div style={{ background: '#FDFAF4' }}>
 
       {/* ════════════════════════════════
-           HERO
+           HERO — immersive dark, flows from navbar
       ════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-20"
-        style={{ background: 'linear-gradient(160deg, #FDFAF4 0%, #F7F0E5 60%, #F0E8D8 100%)' }}>
-
+      <section className="relative overflow-hidden pt-32 pb-20"
+        style={{ background: 'linear-gradient(180deg, #450013 0%, #2E0A12 40%, #1C0E04 100%)' }}>
         <PatternDots />
-        <Mandala className="absolute -left-32 top-1/2 -translate-y-1/2 w-[480px] h-[480px] opacity-60" />
-        <Mandala className="absolute -right-40 top-1/4 w-[360px] h-[360px] opacity-40" />
+        <Mandala className="absolute left-1/2 top-10 -translate-x-1/2 w-[600px] h-[600px] opacity-10 pointer-events-none" />
 
-        {/* top gold line */}
-        <div className="absolute top-0 inset-x-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(140,98,16,0.4), transparent)' }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center animate-fadeUp">
+          <span className="section-label mb-6 justify-center" style={{ color: '#E8C060' }}>India&apos;s Premier Cultural Platform</span>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <p className="font-display text-base tracking-[0.3em] mb-6 opacity-90" style={{ color: '#D4A843' }}>
+            ॥ विद्या विनयेन शोभते ॥
+          </p>
 
-            {/* LEFT */}
-            <div className="animate-fadeUp">
-              <span className="section-label mb-6 block">India&apos;s Premier Cultural Platform</span>
+          <h1 className="font-serif leading-[0.95] mb-6 text-white"
+            style={{ fontSize: 'clamp(2.75rem, 7vw, 5.5rem)' }}>
+            Discover the <span className="italic" style={{ color: '#E8C060' }}>Soul</span><br />of India
+          </h1>
 
-              <p className="font-display text-ekam-gold text-base tracking-[0.3em] mb-4 opacity-80">
-                ॥ विद्या विनयेन शोभते ॥
-              </p>
+          <p className="text-base leading-relaxed mb-10 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            Learn from India&apos;s most celebrated maestros — classical music, Bharatanatyam, Ashtanga Yoga, Sanskrit, Madhubani art and Vedic wisdom. All in one place.
+          </p>
 
-              <h1 className="font-serif leading-[0.92] mb-6"
-                style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', color: '#1C0E04' }}>
-                Discover<br />the{' '}
-                <span className="relative">
-                  <span className="gold-text italic">Soul</span>
-                  <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 160 6" fill="none">
-                    <path d="M0 5 Q80 0 160 5" stroke="#C4881A" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
-                  </svg>
-                </span>
-                <br />of India
-              </h1>
+          <div className="flex flex-wrap gap-3 justify-center mb-14">
+            <Link href="/courses" className="btn-gold text-sm px-7 py-3.5">
+              Explore Courses <ArrowRight size={16} />
+            </Link>
+            <Link href="/auth/signup?role=instructor"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300"
+              style={{ border: '1.5px solid rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.9)' }}>
+              Teach on Ekam
+            </Link>
+          </div>
 
-              <p className="text-base leading-relaxed mb-8 max-w-lg" style={{ color: '#6B5744', lineHeight: '1.75' }}>
-                Learn from India&apos;s most celebrated maestros — classical music, Bharatanatyam, Ashtanga Yoga, Sanskrit, Madhubani art and Vedic wisdom. All in one place.
-              </p>
-
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mb-10">
-                <Link href="/courses" className="btn-gold text-sm px-7 py-3.5">
-                  Explore Courses <ArrowRight size={16} />
-                </Link>
-                <Link href="/auth/signup?role=instructor" className="btn-outline text-sm px-7 py-3.5">
-                  Teach on Ekam
-                </Link>
-              </div>
-
-              {/* Trust strip */}
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                {stats.map((s, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-lg">{s.icon}</span>
-                    <div>
-                      <span className="text-sm font-bold" style={{ color: '#8C6210' }}>{s.value}</span>
-                      <span className="text-xs ml-1.5" style={{ color: '#9B8878' }}>{s.label}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT — floating course chips */}
-            <div className="hidden lg:flex flex-col gap-3 relative animate-fadeUp delay-200">
-              {/* Decorative card behind */}
-              <div className="absolute -right-6 -top-6 w-48 h-48 rounded-3xl opacity-20 pointer-events-none"
-                style={{ background: 'linear-gradient(135deg, rgba(140,98,16,0.2), rgba(196,64,21,0.1))' }} />
-
-              <div className="relative space-y-3 ml-8">
-                {/* Big preview card */}
-                <div className="bg-white rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(139,94,10,0.12)]"
-                  style={{ border: '1px solid #EDE4D8' }}>
-                  <div className="relative h-44 flex items-center justify-center overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #3b0a0a, #451a03)' }}>
-                    <div className="absolute inset-0 opacity-20"
-                      style={{ backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(212,168,67,0.4) 0%, transparent 60%)' }} />
-                    <span className="text-7xl opacity-80 animate-float">{courses[0].thumbnailEmoji}</span>
-                    <div className="absolute bottom-3 left-3">
-                      <span className="badge badge-gold bg-white/90 text-[10px]">⚡ BESTSELLER</span>
-                    </div>
-                    <div className="absolute top-3 right-3 bg-white/90 rounded-xl px-3 py-1.5">
-                      <div className="flex items-center gap-1">
-                        <Star size={11} className="fill-amber-500 text-amber-500" />
-                        <span className="text-xs font-bold text-amber-600">{courses[0].rating}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-4 py-3">
-                    <p className="text-[10px] tracking-widest text-ekam-gold uppercase font-semibold mb-0.5">{courses[0].categoryLabel}</p>
-                    <p className="text-sm font-semibold leading-snug mb-2" style={{ color: '#1C0E04' }}>{courses[0].title.split(':')[0]}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                          style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
-                          {courses[0].instructor?.initials?.charAt(0)}
-                        </div>
-                        <span className="text-[11px]" style={{ color: '#7A6550' }}>{courses[0].instructor?.name?.split(' ').slice(0,2).join(' ')}</span>
-                      </div>
-                      <span className="text-sm font-bold" style={{ color: '#8C6210' }}>{formatPrice(courses[0].price)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Small chips */}
-                <HeroCourseChip course={courses[2]} />
-                <HeroCourseChip course={courses[1]} />
-
-                {/* Floating badge */}
-                <div className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white rounded-2xl px-4 py-3 shadow-[0_8px_24px_rgba(139,94,10,0.14)]"
-                  style={{ border: '1px solid #EDE4D8' }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(26,92,56,0.10)' }}>
-                      <Users size={14} style={{ color: '#1A5C38' }} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold" style={{ color: '#1C0E04' }}>85,000+</p>
-                      <p className="text-[10px]" style={{ color: '#7A6550' }}>learners</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Quick category chips */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categories.map(cat => (
+              <Link key={cat.id} href={`/courses?cat=${cat.id}`}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all hover:-translate-y-0.5"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.75)' }}>
+                <CategoryIcon id={cat.id} size={13} />
+                {cat.label}
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Scroll cue */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
-          <div className="w-5 h-8 rounded-full flex items-start justify-center pt-1.5"
-            style={{ border: '1.5px solid rgba(140,98,16,0.3)' }}>
-            <div className="w-1 h-2 rounded-full animate-bounce" style={{ background: '#8C6210' }} />
+        {/* Stats band */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {stats.map((s, i) => {
+              const Icon = statIcons[s.label] || Users
+              return (
+                <div key={i} className="rounded-2xl px-4 py-5 text-center"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  <Icon size={18} className="mx-auto mb-2" style={{ color: '#D4A843' }} />
+                  <p className="text-lg font-bold font-serif text-white">{s.value}</p>
+                  <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.label}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+           HOW IT WORKS
+      ════════════════════════════════ */}
+      <section className="py-24 px-4" style={{ background: '#FAF5ED' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="section-label mb-4 block justify-center">Getting Started</span>
+            <h2 className="section-title text-4xl md:text-5xl mb-4">How Ekam Works</h2>
+            <p className="max-w-md mx-auto text-base" style={{ color: '#6B5744' }}>
+              Three simple steps between you and a living tradition.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            {[
+              { step: '01', icon: Search, title: 'Browse & Choose', desc: 'Explore 1,200+ courses across 8 living traditions and find the art form that speaks to you.' },
+              { step: '02', icon: PlayCircle, title: 'Learn from Masters', desc: 'Watch structured video lessons from verified gurus, at your own pace, with lifetime access.' },
+              { step: '03', icon: Award, title: 'Practice & Get Certified', desc: 'Track your progress, complete the curriculum, and earn a recognized certificate of completion.' },
+            ].map((item, i) => (
+              <div key={i} className="relative rounded-2xl p-8 bg-white" style={{ border: '1px solid #EDE4D8' }}>
+                <span className="font-serif text-5xl font-semibold block mb-4" style={{ color: 'rgba(140,98,16,0.15)' }}>{item.step}</span>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: 'rgba(140,98,16,0.08)' }}>
+                  <item.icon size={22} className="text-ekam-gold" />
+                </div>
+                <h3 className="font-serif text-lg font-semibold mb-2" style={{ color: '#1C0E04' }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#7A6550' }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -230,30 +183,35 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:auto-rows-[190px]" style={{ gridAutoFlow: 'dense' }}>
             {categories.map(cat => {
-              const c = categoryColors[cat.id] || categoryColors.music
+              const featured = cat.id === 'yoga'
               return (
                 <Link key={cat.id} href={`/courses?cat=${cat.id}`}
-                  className="group relative rounded-2xl p-5 overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                  style={{ background: c.bg, border: `1px solid ${c.border}` }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-4 transition-transform duration-300 group-hover:scale-110"
-                    style={{ background: c.icon }}>
-                    {cat.icon}
+                  className={`group relative rounded-2xl p-5 overflow-hidden transition-all duration-300 hover:-translate-y-1 bg-white flex flex-col justify-between ${
+                    featured ? 'sm:col-span-2 sm:row-span-2' : ''
+                  }`}
+                  style={{ border: '1px solid #EDE4D8' }}>
+                  {featured && (
+                    <CategoryIcon id={cat.id} size={180} className="absolute -right-8 -bottom-8 text-ekam-gold opacity-[0.06] pointer-events-none" />
+                  )}
+                  <div className="relative z-10">
+                    <div className={`rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${
+                      featured ? 'w-16 h-16' : 'w-12 h-12'
+                    }`} style={{ background: 'rgba(140,98,16,0.08)' }}>
+                      <CategoryIcon id={cat.id} size={featured ? 30 : 22} className="text-ekam-gold" />
+                    </div>
+                    <h3 className={`font-serif font-semibold mb-1 ${featured ? 'text-2xl' : 'text-base'}`} style={{ color: '#1C0E04' }}>
+                      {cat.label}
+                    </h3>
+                    <p className={featured ? 'text-sm mb-2 max-w-[240px]' : 'text-xs mb-3'} style={{ color: '#7A6550' }}>{cat.description}</p>
                   </div>
-                  <h3 className="font-serif text-base font-semibold mb-0.5 transition-colors duration-200"
-                    style={{ color: c.label }}>
-                    {cat.label}
-                  </h3>
-                  <p className="text-xs mb-3" style={{ color: c.text, opacity: 0.7 }}>{cat.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold" style={{ color: c.text }}>{cat.count} courses</span>
-                    <ChevronRight size={14} className="transition-transform duration-200 group-hover:translate-x-1"
-                      style={{ color: c.text }} />
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="text-[11px] font-semibold text-ekam-gold">{cat.count} courses</span>
+                    <ChevronRight size={14} className="text-ekam-gold transition-transform duration-200 group-hover:translate-x-1" />
                   </div>
                   {/* Bottom accent line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
-                    style={{ background: c.text }} />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left bg-ekam-gold" />
                 </Link>
               )
             })}
@@ -282,6 +240,30 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ════════════════════════════════
+           FRESH FROM OUR INSTRUCTORS
+      ════════════════════════════════ */}
+      {newInstructorCourses.length > 0 && (
+        <section className="py-24 px-4" style={{ background: '#FFFFFF' }}>
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+              <div>
+                <span className="section-label mb-4 block">Just Published</span>
+                <h2 className="section-title text-4xl md:text-5xl mb-3">Fresh From Our Instructors</h2>
+                <p style={{ color: '#6B5744' }}>Newly approved courses from Ekam&apos;s teaching community</p>
+              </div>
+              <Link href="/courses" className="btn-outline self-start md:self-auto whitespace-nowrap">
+                View All <ArrowRight size={15} />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {newInstructorCourses.map(course => <CourseCard key={course.id} course={course} />)}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ════════════════════════════════
            WHY EKAM — split banner
@@ -362,49 +344,58 @@ export default function HomePage() {
             <p style={{ color: '#6B5744' }}>Custodians of living traditions</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {instructors.slice(0, 6).map(inst => (
-              <div key={inst.id} className="card-base p-6 group">
-                <div className="flex items-start gap-4 mb-4">
-                  {/* Avatar */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white"
-                      style={{ background: 'linear-gradient(135deg, #C4881A 0%, #C44015 100%)' }}>
-                      {inst.initials}
-                    </div>
-                    {inst.verified && (
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center"
-                        style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.1)' }}>
-                        <CheckCircle2 size={13} style={{ color: '#8C6210' }} />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-serif font-semibold text-base leading-tight mb-0.5" style={{ color: '#1C0E04' }}>
-                      {inst.name}
-                    </h3>
-                    <p className="text-xs font-medium mb-2" style={{ color: '#8C6210' }}>{inst.title}</p>
-                    <div className="flex items-center gap-3 text-xs" style={{ color: '#7A6550' }}>
-                      <span className="flex items-center gap-1">
-                        <Star size={11} className="fill-amber-500 text-amber-500" />{inst.rating}
-                      </span>
-                      <span>·</span>
-                      <span>{formatNumber(inst.students)} students</span>
-                      <span>·</span>
-                      <span>{inst.courses} courses</span>
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            {/* Featured maestro — spotlight panel */}
+            <div className="lg:col-span-2 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-end"
+              style={{ background: 'linear-gradient(145deg, #1C0E04 0%, #2E1A0A 100%)', minHeight: '400px' }}>
+              <Mandala className="absolute -right-16 -top-16 w-64 h-64 opacity-15 pointer-events-none" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-4"
+                  style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
+                  {instructors[0].initials}
                 </div>
-
-                <p className="text-xs leading-relaxed line-clamp-2 mb-4" style={{ color: '#7A6550' }}>{inst.bio}</p>
-
-                <Link href={`/courses?instructor=${inst.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-ekam-gold hover:text-ekam-gold-light transition-colors duration-200 group-hover:gap-2">
-                  View Courses <ChevronRight size={13} />
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-serif text-2xl font-semibold text-white">{instructors[0].name}</h3>
+                  {instructors[0].verified && <CheckCircle2 size={16} style={{ color: '#D4A843' }} />}
+                </div>
+                <p className="text-sm mb-3" style={{ color: '#D4A843' }}>{instructors[0].title}</p>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.55)' }}>{instructors[0].bio}</p>
+                <div className="flex items-center gap-4 text-xs mb-5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <span className="flex items-center gap-1"><Star size={12} className="fill-amber-400 text-amber-400" />{instructors[0].rating}</span>
+                  <span>{formatNumber(instructors[0].students)} students</span>
+                  <span>{instructors[0].courses} courses</span>
+                </div>
+                <Link href={`/courses?instructor=${instructors[0].id}`} className="btn-gold text-sm">
+                  View Courses <ChevronRight size={14} />
                 </Link>
               </div>
-            ))}
+            </div>
+
+            {/* Rest — compact list rows */}
+            <div className="lg:col-span-3 flex flex-col gap-3">
+              {instructors.slice(1, 6).map(inst => (
+                <Link key={inst.id} href={`/courses?instructor=${inst.id}`}
+                  className="group flex items-center gap-4 p-4 rounded-2xl bg-white transition-all duration-300 hover:-translate-y-0.5"
+                  style={{ border: '1px solid #EDE4D8' }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
+                    {inst.initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-serif font-semibold text-sm truncate" style={{ color: '#1C0E04' }}>{inst.name}</h4>
+                      {inst.verified && <CheckCircle2 size={12} className="flex-shrink-0" style={{ color: '#8C6210' }} />}
+                    </div>
+                    <p className="text-xs truncate" style={{ color: '#8C6210' }}>{inst.title}</p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-3 text-xs flex-shrink-0" style={{ color: '#7A6550' }}>
+                    <span className="flex items-center gap-1"><Star size={11} className="fill-amber-500 text-amber-500" />{inst.rating}</span>
+                    <span>{formatNumber(inst.students)}</span>
+                  </div>
+                  <ChevronRight size={15} className="text-ekam-gold flex-shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="text-center mt-8">
@@ -458,6 +449,25 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+           FAQ
+      ════════════════════════════════ */}
+      <section className="py-24 px-4" style={{ background: '#FAF5ED' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="section-label mb-4 block justify-center">Questions</span>
+            <h2 className="section-title text-4xl md:text-5xl mb-4">Frequently Asked</h2>
+            <p style={{ color: '#6B5744' }}>Everything you need to know before you begin</p>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((item, i) => (
+              <FaqItem key={i} item={item} isOpen={openFaq === i} onToggle={() => setOpenFaq(openFaq === i ? null : i)} />
             ))}
           </div>
         </div>

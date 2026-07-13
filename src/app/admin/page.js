@@ -7,10 +7,11 @@ import {
   Users, BookOpen, Shield, TrendingUp, CheckCircle2, XCircle,
   Eye, Trash2, Search, Filter, BarChart3, AlertTriangle,
   DollarSign, Star, Globe, Bell, Settings, LogOut, ChevronDown,
-  Clock, Badge
+  Clock, Badge, Percent
 } from 'lucide-react'
 import { courses as allCourses, instructors, adminStats } from '@/lib/data'
-import { formatPrice, formatNumber } from '@/lib/utils'
+import { formatPrice, formatNumber, pushNotification } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
 
 const NAV = [
   { id: 'overview', icon: BarChart3, label: 'Overview' },
@@ -28,6 +29,7 @@ export default function AdminPage() {
   const [pendingCourses, setPendingCourses] = useState([])
   const [allUserCourses, setAllUserCourses] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [commissionRegistry, setCommissionRegistry] = useState({})
 
   useEffect(() => {
     const stored = localStorage.getItem('ekam_user')
@@ -49,29 +51,55 @@ export default function AdminPage() {
     }
     setAllUserCourses(allCoursesList)
     setPendingCourses(allCoursesList.filter(c => c.status === 'pending'))
+    setCommissionRegistry(JSON.parse(localStorage.getItem('ekam_instructor_commissions') || '{}'))
   }, [router])
 
-  const approveCoure = (courseId) => {
-    updateCourseStatus(courseId, 'published')
+  const approveCoure = (courseId, commissionPct) => {
+    updateCourseStatus(courseId, 'published', commissionPct)
+
+    const course = allUserCourses.find(c => c.id === courseId)
+    if (course?.instructor?.id) {
+      const registry = { ...commissionRegistry, [course.instructor.id]: commissionPct }
+      setCommissionRegistry(registry)
+      localStorage.setItem('ekam_instructor_commissions', JSON.stringify(registry))
+
+      pushNotification(course.instructor.id, {
+        type: 'approved',
+        title: 'Course approved',
+        message: `"${course.title}" has been approved and published. Ekam commission for this course is set at ${commissionPct}%.`,
+        courseId,
+      })
+    }
   }
 
   const rejectCourse = (courseId) => {
+    const course = allUserCourses.find(c => c.id === courseId)
     updateCourseStatus(courseId, 'rejected')
+
+    if (course?.instructor?.id) {
+      pushNotification(course.instructor.id, {
+        type: 'rejected',
+        title: 'Course rejected',
+        message: `"${course.title}" was not approved. Edit the course and resubmit for review.`,
+        courseId,
+      })
+    }
   }
 
-  const updateCourseStatus = (courseId, status) => {
+  const updateCourseStatus = (courseId, status, commissionPct) => {
+    const patch = commissionPct != null ? { status, commissionPct } : { status }
     // Update in all instructor localStorage keys
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (key?.startsWith('ekam_courses_')) {
         try {
           let courses = JSON.parse(localStorage.getItem(key) || '[]')
-          courses = courses.map(c => c.id === courseId ? { ...c, status } : c)
+          courses = courses.map(c => c.id === courseId ? { ...c, ...patch } : c)
           localStorage.setItem(key, JSON.stringify(courses))
         } catch {}
       }
     }
-    const updated = allUserCourses.map(c => c.id === courseId ? { ...c, status } : c)
+    const updated = allUserCourses.map(c => c.id === courseId ? { ...c, ...patch } : c)
     setAllUserCourses(updated)
     setPendingCourses(updated.filter(c => c.status === 'pending'))
   }
@@ -193,7 +221,8 @@ export default function AdminPage() {
                 </div>
                 <div className="space-y-3">
                   {allUserCourses.slice(0, 5).map(course => (
-                    <CourseApprovalRow key={course.id} course={course} onApprove={approveCoure} onReject={rejectCourse} />
+                    <CourseApprovalRow key={course.id} course={course} onApprove={approveCoure} onReject={rejectCourse}
+                      defaultCommission={commissionRegistry[course.instructor?.id] ?? 20} />
                   ))}
                 </div>
               </div>
@@ -219,7 +248,9 @@ export default function AdminPage() {
                       <tr key={course.id}>
                         <td>
                           <div className="flex items-center gap-2">
-                            <span className="text-lg">{course.thumbnailEmoji}</span>
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(140,98,16,0.08)' }}>
+                              <CategoryIcon id={course.category} size={14} className="text-ekam-gold" />
+                            </div>
                             <p className="text-sm text-ekam-cream font-medium line-clamp-1 max-w-[200px]">{course.title}</p>
                           </div>
                         </td>
@@ -268,6 +299,7 @@ export default function AdminPage() {
                     <th>Students</th>
                     <th>Rating</th>
                     <th>Price</th>
+                    <th>Commission</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -282,7 +314,9 @@ export default function AdminPage() {
                       <tr key={course.id}>
                         <td>
                           <div className="flex items-center gap-2">
-                            <span className="text-lg">{course.thumbnailEmoji}</span>
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(140,98,16,0.08)' }}>
+                              <CategoryIcon id={course.category} size={14} className="text-ekam-gold" />
+                            </div>
                             <p className="text-sm text-ekam-cream font-medium line-clamp-1 max-w-[180px]">{course.title}</p>
                           </div>
                         </td>
@@ -296,6 +330,11 @@ export default function AdminPage() {
                         <td className="text-ekam-cream-dim">{formatNumber(course.studentCount || 0)}</td>
                         <td className="text-ekam-gold">★ {course.rating || '—'}</td>
                         <td className="text-ekam-gold font-medium">{formatPrice(course.price)}</td>
+                        <td className="text-ekam-cream-dim text-sm">
+                          {course.price === 0 ? '—' : course.commissionPct != null ? `${course.commissionPct}%` : (
+                            course.status === 'pending' ? <span className="badge badge-saffron text-[10px]">Pending</span> : '—'
+                          )}
+                        </td>
                         <td>
                           <div className="flex gap-1">
                             <Link href={`/courses/${course.id}`}
@@ -303,16 +342,10 @@ export default function AdminPage() {
                               <Eye size={13} />
                             </Link>
                             {course.status === 'pending' && (
-                              <>
-                                <button onClick={() => approveCoure(course.id)}
-                                  className="w-7 h-7 rounded flex items-center justify-center text-ekam-muted hover:text-green-400 hover:bg-green-900/20 transition-all">
-                                  <CheckCircle2 size={13} />
-                                </button>
-                                <button onClick={() => rejectCourse(course.id)}
-                                  className="w-7 h-7 rounded flex items-center justify-center text-ekam-muted hover:text-red-400 hover:bg-red-900/20 transition-all">
-                                  <XCircle size={13} />
-                                </button>
-                              </>
+                              <button onClick={() => setSection('approvals')}
+                                className="px-2 h-7 rounded flex items-center justify-center text-[11px] font-medium text-ekam-gold hover:bg-ekam-gold/10 transition-all whitespace-nowrap">
+                                Review →
+                              </button>
                             )}
                           </div>
                         </td>
@@ -392,7 +425,8 @@ export default function AdminPage() {
             ) : (
               <div className="space-y-4">
                 {pendingCourses.map(course => (
-                  <CourseApprovalRow key={course.id} course={course} onApprove={approveCoure} onReject={rejectCourse} expanded />
+                  <CourseApprovalRow key={course.id} course={course} onApprove={approveCoure} onReject={rejectCourse} expanded
+                    defaultCommission={commissionRegistry[course.instructor?.id] ?? 20} />
                 ))}
               </div>
             )}
@@ -439,14 +473,17 @@ export default function AdminPage() {
   )
 }
 
-function CourseApprovalRow({ course, onApprove, onReject, expanded = false }) {
+function CourseApprovalRow({ course, onApprove, onReject, expanded = false, defaultCommission = 20 }) {
+  const [approving, setApproving] = useState(false)
+  const [commission, setCommission] = useState(defaultCommission)
+
   return (
     <div className="card-base p-5">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-4 flex-1 min-w-0">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl flex-shrink-0"
-            style={{ background: '#FAFAF4' }}>
-            {course.thumbnailEmoji}
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(140,98,16,0.08)' }}>
+            <CategoryIcon id={course.category} size={26} className="text-ekam-gold" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-serif text-base text-ekam-cream font-medium mb-0.5">{course.title}</h3>
@@ -465,21 +502,43 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false }) {
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="badge badge-saffron text-[10px]">PENDING</span>
+          {!approving && <span className="badge badge-saffron text-[10px]">PENDING</span>}
           <Link href={`/courses/${course.id}`}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-ekam-muted hover:text-ekam-gold hover:bg-ekam-gold/10 transition-all">
             <Eye size={14} />
           </Link>
-          <button onClick={() => onApprove(course.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-green-400 transition-all"
-            style={{ background: 'rgba(76,175,114,0.1)', border: '1px solid rgba(76,175,114,0.3)' }}>
-            <CheckCircle2 size={13} /> Approve
-          </button>
-          <button onClick={() => onReject(course.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 transition-all"
-            style={{ background: 'rgba(139,32,32,0.1)', border: '1px solid rgba(139,32,32,0.3)' }}>
-            <XCircle size={13} /> Reject
-          </button>
+
+          {!approving ? (
+            <>
+              <button onClick={() => setApproving(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-green-400 transition-all"
+                style={{ background: 'rgba(76,175,114,0.1)', border: '1px solid rgba(76,175,114,0.3)' }}>
+                <CheckCircle2 size={13} /> Approve
+              </button>
+              <button onClick={() => onReject(course.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 transition-all"
+                style={{ background: 'rgba(139,32,32,0.1)', border: '1px solid rgba(139,32,32,0.3)' }}>
+                <XCircle size={13} /> Reject
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(140,98,16,0.06)', border: '1px solid rgba(140,98,16,0.2)' }}>
+              <Percent size={12} className="text-ekam-gold" />
+              <input
+                type="number" min="0" max="100" value={commission}
+                onChange={e => setCommission(e.target.value)}
+                className="w-12 bg-transparent text-xs text-ekam-cream outline-none"
+              />
+              <span className="text-xs text-ekam-muted">commission</span>
+              <button onClick={() => onApprove(course.id, Math.min(100, Math.max(0, Number(commission) || 0)))}
+                className="text-xs font-semibold text-ekam-gold hover:text-ekam-gold-light transition-colors">
+                Confirm
+              </button>
+              <button onClick={() => setApproving(false)} className="text-ekam-muted hover:text-ekam-cream transition-colors">
+                <XCircle size={13} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

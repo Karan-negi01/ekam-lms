@@ -48,3 +48,51 @@ export function getRatingLabel(rating) {
   if (rating >= 4.0) return 'Well Rated'
   return 'Good'
 }
+
+// Reads every instructor's locally-saved courses and returns only the ones
+// an admin has approved (status === 'published'), so they can be shown
+// alongside the static catalog on the homepage / courses pages.
+export function getPublishedUserCourses() {
+  if (typeof window === 'undefined') return []
+  const result = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.startsWith('ekam_courses_')) {
+      try {
+        const stored = JSON.parse(localStorage.getItem(key) || '[]')
+        result.push(...stored.filter(c => c.status === 'published'))
+      } catch {}
+    }
+  }
+  return result
+}
+
+// Simple per-user notification inbox, stored in localStorage so instructors
+// find out when admin has reviewed their course (e.g. the commission rate
+// that was set) without needing a backend/email to deliver the message.
+export function getNotifications(userId) {
+  if (typeof window === 'undefined' || !userId) return []
+  try {
+    return JSON.parse(localStorage.getItem(`ekam_notifications_${userId}`) || '[]')
+  } catch {
+    return []
+  }
+}
+
+export function pushNotification(userId, notification) {
+  if (typeof window === 'undefined' || !userId) return
+  const list = getNotifications(userId)
+  list.unshift({
+    id: 'n-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    read: false,
+    createdAt: new Date().toISOString(),
+    ...notification,
+  })
+  localStorage.setItem(`ekam_notifications_${userId}`, JSON.stringify(list))
+}
+
+export function markNotificationsRead(userId) {
+  if (typeof window === 'undefined' || !userId) return
+  const list = getNotifications(userId).map(n => ({ ...n, read: true }))
+  localStorage.setItem(`ekam_notifications_${userId}`, JSON.stringify(list))
+}

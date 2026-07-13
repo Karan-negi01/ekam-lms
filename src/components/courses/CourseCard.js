@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Star, Clock, Users, BookOpen, BadgeCheck, Play } from 'lucide-react'
 import { formatPrice, formatNumber, getDiscount } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
 
 const thumbGrads = {
   'from-amber-900 via-red-900 to-amber-800': 'linear-gradient(135deg, #451a03 0%, #450a0a 60%, #3b1203 100%)',
@@ -29,11 +30,13 @@ export default function CourseCard({ course, compact = false }) {
           <div className="absolute inset-0"
             style={{ backgroundImage: 'radial-gradient(ellipse at 30% 35%, rgba(212,168,67,0.22) 0%, transparent 60%)' }} />
 
-          {/* Emoji */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl select-none transition-transform duration-500 group-hover:scale-110 drop-shadow-lg">
-              {course.thumbnailEmoji}
-            </span>
+          {/* Motif */}
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <CategoryIcon id={course.category} size={150} className="absolute text-white opacity-[0.07] rotate-6 scale-110" />
+            <div className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
+              style={{ background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.22)' }}>
+              <CategoryIcon id={course.category} size={28} className="text-white" />
+            </div>
           </div>
 
           {/* Play button on hover */}

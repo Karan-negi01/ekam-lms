@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, ArrowRight, Lock, Mail } from 'lucide-react'
+import AuthSidePanel from '@/components/layout/AuthSidePanel'
 
 function LoginForm() {
   const router = useRouter()
@@ -51,29 +52,29 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-16 cultural-bg"
-      style={{ background: 'linear-gradient(160deg, #FDFAF4 0%, #F5EFE4 100%)' }}>
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(140,98,16,0.05) 0%, transparent 70%)' }} />
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-16 md:pt-20">
+      <AuthSidePanel />
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex flex-col items-center gap-2">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)', boxShadow: '0 0 28px rgba(140,98,16,0.25)' }}>
-              <span className="font-display font-bold text-3xl text-white">ए</span>
-            </div>
-            <div>
-              <p className="font-display text-2xl font-semibold tracking-widest" style={{ color: '#1C0E04' }}>EKAM</p>
-              <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-75">एकम्</p>
-            </div>
-          </Link>
-          <h1 className="font-serif text-2xl mt-6 mb-1" style={{ color: '#1C0E04' }}>Welcome Back</h1>
-          <p className="text-sm" style={{ color: '#7A6550' }}>Sign in to continue your learning journey</p>
-        </div>
+      <div className="flex items-center justify-center px-4 py-24 lg:py-16 relative"
+        style={{ background: '#FDFAF4' }}>
+        <div className="w-full max-w-md relative z-10">
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex lg:hidden flex-col items-center gap-2 mb-6">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)', boxShadow: '0 0 28px rgba(140,98,16,0.25)' }}>
+                <span className="font-display font-bold text-3xl text-white">ए</span>
+              </div>
+              <div>
+                <p className="font-display text-2xl font-semibold tracking-widest" style={{ color: '#1C0E04' }}>EKAM</p>
+                <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-75">एकम्</p>
+              </div>
+            </Link>
+            <h1 className="font-serif text-2xl mb-1" style={{ color: '#1C0E04' }}>Welcome Back</h1>
+            <p className="text-sm" style={{ color: '#7A6550' }}>Sign in to continue your learning journey</p>
+          </div>
 
-        <div className="rounded-2xl p-6 md:p-8 bg-white"
-          style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 40px rgba(139,94,10,0.10)' }}>
+          <div className="rounded-2xl p-6 md:p-8 bg-white"
+            style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 40px rgba(139,94,10,0.10)' }}>
 
           {/* Demo logins */}
           <div className="mb-6">
@@ -150,12 +151,13 @@ function LoginForm() {
           </p>
         </div>
 
-        <p className="text-center text-xs mt-6" style={{ color: '#7A6550' }}>
-          By signing in, you agree to Ekam&apos;s{' '}
-          <Link href="/terms" className="text-ekam-gold hover:text-ekam-gold-light transition-colors">Terms</Link>
-          {' '}and{' '}
-          <Link href="/privacy" className="text-ekam-gold hover:text-ekam-gold-light transition-colors">Privacy Policy</Link>
-        </p>
+          <p className="text-center text-xs mt-6" style={{ color: '#7A6550' }}>
+            By signing in, you agree to Ekam&apos;s{' '}
+            <Link href="/terms" className="text-ekam-gold hover:text-ekam-gold-light transition-colors">Terms</Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="text-ekam-gold hover:text-ekam-gold-light transition-colors">Privacy Policy</Link>
+          </p>
+        </div>
       </div>
     </div>
   )

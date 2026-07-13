@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X, ChevronDown, BookOpen, LayoutDashboard, Shield, LogOut, User, Bell } from 'lucide-react'
+import { Search, Menu, X, ChevronDown, BookOpen, LayoutDashboard, Shield, LogOut, User, Bell, CheckCircle2, XCircle } from 'lucide-react'
+import { getNotifications, markNotificationsRead } from '@/lib/utils'
 
 const navLinks = [
   { label: 'Courses', href: '/courses' },
@@ -18,6 +20,8 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
   const [user, setUser] = useState(null)
   const pathname = usePathname()
 
@@ -29,13 +33,30 @@ export default function Header() {
 
   useEffect(() => {
     const stored = localStorage.getItem('ekam_user')
-    if (stored) setUser(JSON.parse(stored))
+    const u = stored ? JSON.parse(stored) : null
+    setUser(u)
+    setNotifications(u ? getNotifications(u.id) : [])
   }, [pathname])
 
   useEffect(() => {
     setMenuOpen(false)
     setUserMenuOpen(false)
+    setNotifOpen(false)
   }, [pathname])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const toggleNotifications = () => {
+    setNotifOpen(prev => {
+      const next = !prev
+      if (next && user && unreadCount > 0) {
+        markNotificationsRead(user.id)
+        setNotifications(getNotifications(user.id))
+      }
+      return next
+    })
+    setUserMenuOpen(false)
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('ekam_user')
@@ -45,29 +66,25 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-[0_2px_20px_rgba(139,94,10,0.08)]'
-          : 'bg-white/80 backdrop-blur-sm'
-      }`}
-      style={{ borderBottom: '1px solid #EDE4D8' }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        background: '#450013',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: isScrolled ? '0 2px 20px rgba(0,0,0,0.25)' : 'none',
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
-                <span className="text-white font-display font-bold text-lg leading-none">ए</span>
-              </div>
-              <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ boxShadow: '0 0 18px rgba(140,98,16,0.35)' }}/>
-            </div>
-            <div>
-              <span className="font-display text-xl font-semibold tracking-widest text-ekam-cream">EKAM</span>
-              <p className="text-[10px] tracking-[0.2em] text-ekam-gold opacity-80 leading-none">एकम्</p>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/ekam-logo-crop.png"
+              alt="Ekam"
+              width={1056}
+              height={588}
+              priority
+              className="h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -76,11 +93,14 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                style={
                   pathname === link.href
-                    ? 'text-ekam-gold bg-ekam-gold/10'
-                    : 'text-ekam-muted hover:text-ekam-cream hover:bg-ekam-surface'
-                }`}
+                    ? { color: '#E8C060', background: 'rgba(212,168,67,0.15)' }
+                    : { color: 'rgba(255,255,255,0.65)' }
+                }
+                onMouseEnter={e => { if (pathname !== link.href) { e.currentTarget.style.color = '#FFFFFF'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' } }}
+                onMouseLeave={e => { if (pathname !== link.href) { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; e.currentTarget.style.background = 'transparent' } }}
               >
                 {link.label}
               </Link>
@@ -91,29 +111,75 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg text-ekam-muted hover:text-ekam-gold hover:bg-ekam-surface transition-all duration-200"
+              className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#E8C060'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'transparent' }}
             >
               <Search size={18} />
             </button>
 
             {user ? (
               <>
-                <button className="w-9 h-9 relative flex items-center justify-center rounded-lg text-ekam-muted hover:text-ekam-gold hover:bg-ekam-surface transition-all duration-200">
-                  <Bell size={18} />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-ekam-saffron"></span>
-                </button>
+                <div className="relative">
+                  <button onClick={toggleNotifications}
+                    className="w-9 h-9 relative flex items-center justify-center rounded-lg transition-all duration-200"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#E8C060'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'transparent' }}
+                  >
+                    <Bell size={18} />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-ekam-saffron"></span>
+                    )}
+                  </button>
+
+                  {notifOpen && (
+                    <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-xl overflow-hidden shadow-lg z-50 bg-white"
+                      style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 32px rgba(139,94,10,0.12)' }}>
+                      <div className="px-4 py-3" style={{ borderBottom: '1px solid #EDE4D8' }}>
+                        <p className="text-sm font-medium text-ekam-cream">Notifications</p>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <p className="text-xs text-ekam-muted text-center py-8 px-4">No notifications yet</p>
+                        ) : (
+                          notifications.map(n => (
+                            <div key={n.id} className="flex items-start gap-3 px-4 py-3"
+                              style={{ borderBottom: '1px solid #F5EFE4' }}>
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                style={{ background: n.type === 'rejected' ? 'rgba(176,24,24,0.1)' : 'rgba(76,175,114,0.12)' }}>
+                                {n.type === 'rejected'
+                                  ? <XCircle size={14} style={{ color: '#B01818' }} />
+                                  : <CheckCircle2 size={14} style={{ color: '#1A5C38' }} />
+                                }
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-medium text-ekam-cream">{n.title}</p>
+                                <p className="text-xs text-ekam-muted mt-0.5 leading-relaxed">{n.message}</p>
+                                <p className="text-[10px] text-ekam-muted mt-1">
+                                  {new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <div className="relative">
                   <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false) }}
                     className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg transition-all duration-200"
-                    style={{ border: '1.5px solid #E2D5C4' }}
+                    style={{ border: '1.5px solid rgba(255,255,255,0.2)' }}
                   >
                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
                       style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
                       {user.name?.charAt(0) || 'U'}
                     </div>
-                    <ChevronDown size={14} className={`text-ekam-muted transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.7)' }} />
                   </button>
 
                   {userMenuOpen && (
@@ -155,14 +221,15 @@ export default function Header() {
               </>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/auth/login" className="btn-ghost text-sm">Sign In</Link>
+                <Link href="/auth/login" className="btn-ghost text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>Sign In</Link>
                 <Link href="/auth/signup" className="btn-gold text-sm">Join Ekam</Link>
               </div>
             )}
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-ekam-muted hover:text-ekam-cream"
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200"
+              style={{ color: 'rgba(255,255,255,0.75)' }}
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -172,18 +239,18 @@ export default function Header() {
         {/* Search Bar */}
         {searchOpen && (
           <div className="pb-4 animate-scaleIn">
-            <div className="relative search-glow rounded-xl overflow-hidden bg-white"
-              style={{ border: '1.5px solid #E2D5C4' }}>
-              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ekam-muted" />
+            <div className="relative search-glow rounded-xl overflow-hidden"
+              style={{ border: '1.5px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)' }}>
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.5)' }} />
               <input
                 type="text"
                 placeholder="Search for courses, instructors, topics..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full pl-10 pr-12 py-3.5 bg-transparent text-sm text-ekam-cream placeholder:text-ekam-muted outline-none"
+                className="w-full pl-10 pr-12 py-3.5 bg-transparent text-sm text-white placeholder-white/40 outline-none"
               />
-              <button onClick={() => setSearchOpen(false)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ekam-muted hover:text-ekam-cream">
+              <button onClick={() => setSearchOpen(false)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <X size={16} />
               </button>
             </div>
@@ -193,17 +260,19 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white" style={{ borderTop: '1px solid #EDE4D8' }}>
+        <div className="md:hidden" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: '#450013' }}>
           <div className="px-4 py-4 space-y-1">
             {navLinks.map(link => (
               <Link key={link.href} href={link.href}
-                className="flex items-center px-4 py-3 rounded-lg text-sm font-medium text-ekam-muted hover:text-ekam-gold hover:bg-ekam-surface transition-all">
+                className="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all"
+                style={{ color: 'rgba(255,255,255,0.7)' }}>
                 {link.label}
               </Link>
             ))}
             {!user && (
-              <div className="pt-3 flex flex-col gap-2" style={{ borderTop: '1px solid #EDE4D8', marginTop: '12px' }}>
-                <Link href="/auth/login" className="btn-outline w-full justify-center">Sign In</Link>
+              <div className="pt-3 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: '12px' }}>
+                <Link href="/auth/login" className="btn-outline w-full justify-center"
+                  style={{ color: '#E8C060', borderColor: 'rgba(255,255,255,0.25)' }}>Sign In</Link>
                 <Link href="/auth/signup" className="btn-gold w-full justify-center">Join Ekam</Link>
               </div>
             )}

@@ -6,10 +6,13 @@ import Link from 'next/link'
 import {
   Plus, BookOpen, Users, Star, BarChart3, Video, Edit3, Trash2,
   Eye, Clock, CheckCircle2, AlertCircle, Upload, X, DollarSign,
-  TrendingUp, Play
+  TrendingUp, Play, GraduationCap, FileText, Percent
 } from 'lucide-react'
 import { courses as allCourses, categories } from '@/lib/data'
 import { formatPrice, formatNumber } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
+
+const EMPTY_LESSON = { title: '', videoUrl: '', duration: '', free: false, materialUrl: '' }
 
 const EMPTY_COURSE = {
   title: '',
@@ -18,9 +21,10 @@ const EMPTY_COURSE = {
   price: '',
   level: 'Beginner',
   language: 'Hindi & English',
-  thumbnailEmoji: '🎵',
   videoUrl: '',
-  sections: [{ title: '', lessons: [{ title: '', videoUrl: '', duration: '', free: false }] }],
+  studyMaterialType: 'none',
+  studyMaterialUrl: '',
+  sections: [{ title: '', lessons: [{ ...EMPTY_LESSON }] }],
 }
 
 function SidebarLink({ href, icon: Icon, label, active }) {
@@ -67,6 +71,9 @@ export default function DashboardPage() {
       id: editingCourse?.id || 'my-course-' + Date.now(),
       ...courseForm,
       price: Number(courseForm.price) || 0,
+      originalPrice: Number(courseForm.price) || 0,
+      category: courseForm.category,
+      categoryLabel: categories.find(c => c.id === courseForm.category)?.label || '',
       instructor: { name: user.name, initials: user.name?.slice(0, 2).toUpperCase(), verified: false, id: user.id },
       rating: 0,
       reviewCount: 0,
@@ -116,9 +123,10 @@ export default function DashboardPage() {
       price: course.price,
       level: course.level,
       language: course.language,
-      thumbnailEmoji: course.thumbnailEmoji,
       videoUrl: course.videoUrl || '',
-      sections: course.sections || [{ title: '', lessons: [{ title: '', videoUrl: '', duration: '', free: false }] }],
+      studyMaterialType: course.studyMaterialType || 'none',
+      studyMaterialUrl: course.studyMaterialUrl || '',
+      sections: course.sections || [{ title: '', lessons: [{ ...EMPTY_LESSON }] }],
     })
     setFormStep(1)
     setShowCreateModal(true)
@@ -127,7 +135,7 @@ export default function DashboardPage() {
   const addSection = () => {
     setCourseForm(prev => ({
       ...prev,
-      sections: [...prev.sections, { title: '', lessons: [{ title: '', videoUrl: '', duration: '', free: false }] }],
+      sections: [...prev.sections, { title: '', lessons: [{ ...EMPTY_LESSON }] }],
     }))
   }
 
@@ -136,7 +144,7 @@ export default function DashboardPage() {
       const sections = [...prev.sections]
       sections[sIdx] = {
         ...sections[sIdx],
-        lessons: [...sections[sIdx].lessons, { title: '', videoUrl: '', duration: '', free: false }],
+        lessons: [...sections[sIdx].lessons, { ...EMPTY_LESSON }],
       }
       return { ...prev, sections }
     })
@@ -181,6 +189,16 @@ export default function DashboardPage() {
     { label: 'Avg Rating', value: myCourses.length ? (myCourses.reduce((a, c) => a + c.rating, 0) / myCourses.length || 0).toFixed(1) : '—', icon: Star, color: '#F0C96A' },
     { label: 'Est. Revenue', value: formatPrice(myCourses.reduce((a, c) => a + (c.price * c.studentCount || 0), 0)), icon: DollarSign, color: '#4CAF72' },
   ]
+
+  const formatRupees = (n) => `₹${Math.round(n).toLocaleString('en-IN')}`
+
+  const paidCourses = myCourses.filter(c => c.price > 0)
+  const grossRevenue = paidCourses.reduce((a, c) => a + c.price * (c.studentCount || 0), 0)
+  const totalCommission = paidCourses.reduce((a, c) => {
+    const gross = c.price * (c.studentCount || 0)
+    return a + (c.commissionPct != null ? gross * (c.commissionPct / 100) : 0)
+  }, 0)
+  const netPayout = grossRevenue - totalCommission
 
   if (!user) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
@@ -276,7 +294,9 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="card-base p-12 text-center">
-                <div className="text-5xl mb-4">🎓</div>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
+                  <GraduationCap size={28} className="text-ekam-gold" />
+                </div>
                 <h3 className="font-serif text-xl text-ekam-cream mb-2">Create Your First Course</h3>
                 <p className="text-ekam-muted mb-6 max-w-sm mx-auto">
                   Share your expertise with thousands of learners. Create a course in any cultural art form.
@@ -301,7 +321,9 @@ export default function DashboardPage() {
 
             {myCourses.length === 0 ? (
               <div className="card-base p-12 text-center">
-                <div className="text-4xl mb-3">📚</div>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(140,98,16,0.08)' }}>
+                  <BookOpen size={24} className="text-ekam-gold" />
+                </div>
                 <p className="text-ekam-cream mb-2">No courses yet</p>
                 <p className="text-ekam-muted text-sm mb-5">Create your first course to get started</p>
                 <button onClick={() => setShowCreateModal(true)} className="btn-gold">
@@ -322,11 +344,67 @@ export default function DashboardPage() {
         {activeSection === 'earnings' && (
           <div>
             <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-8">Earnings</h1>
-            <div className="card-base p-8 text-center">
-              <TrendingUp size={32} className="text-ekam-gold mx-auto mb-3" />
-              <p className="text-ekam-cream font-medium mb-1">Revenue Analytics</p>
-              <p className="text-ekam-muted text-sm">Earnings dashboard will be available once you have students enrolled in your courses.</p>
-            </div>
+
+            {paidCourses.length === 0 ? (
+              <div className="card-base p-8 text-center">
+                <TrendingUp size={32} className="text-ekam-gold mx-auto mb-3" />
+                <p className="text-ekam-cream font-medium mb-1">Revenue Analytics</p>
+                <p className="text-ekam-muted text-sm">Earnings dashboard will be available once you have a paid course with students enrolled.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="card-base p-5">
+                    <p className="text-xs text-ekam-muted uppercase tracking-wide mb-2">Gross Revenue</p>
+                    <p className="text-2xl font-semibold" style={{ color: '#8C6210' }}>{formatRupees(grossRevenue)}</p>
+                  </div>
+                  <div className="card-base p-5">
+                    <p className="text-xs text-ekam-muted uppercase tracking-wide mb-2">Ekam Commission</p>
+                    <p className="text-2xl font-semibold" style={{ color: '#E8622A' }}>{formatRupees(totalCommission)}</p>
+                  </div>
+                  <div className="card-base p-5">
+                    <p className="text-xs text-ekam-muted uppercase tracking-wide mb-2">Your Payout</p>
+                    <p className="text-2xl font-semibold" style={{ color: '#4CAF72' }}>{formatRupees(netPayout)}</p>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
+                  <table className="table-ekam">
+                    <thead style={{ background: '#FAFAF4' }}>
+                      <tr>
+                        <th>Course</th>
+                        <th>Students</th>
+                        <th>Price</th>
+                        <th>Commission</th>
+                        <th>Your Payout</th>
+                      </tr>
+                    </thead>
+                    <tbody style={{ background: '#FFFFFF' }}>
+                      {paidCourses.map(c => {
+                        const gross = c.price * (c.studentCount || 0)
+                        const payout = c.commissionPct != null ? gross * (1 - c.commissionPct / 100) : null
+                        return (
+                          <tr key={c.id}>
+                            <td className="text-sm text-ekam-cream font-medium line-clamp-1 max-w-[220px]">{c.title}</td>
+                            <td className="text-ekam-cream-dim">{formatNumber(c.studentCount || 0)}</td>
+                            <td className="text-ekam-gold font-medium">{formatPrice(c.price)}</td>
+                            <td className="text-ekam-cream-dim">
+                              {c.commissionPct != null ? `${c.commissionPct}%` : (
+                                <span className="badge badge-saffron text-[10px]">Pending review</span>
+                              )}
+                            </td>
+                            <td className="text-ekam-gold font-medium">{payout != null ? formatRupees(payout) : '—'}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-ekam-muted mt-3">
+                  Commission rates are set individually per course by the Ekam admin team during review, based on category and reach.
+                </p>
+              </>
+            )}
           </div>
         )}
 
@@ -432,17 +510,10 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Language</label>
-                      <input type="text" value={courseForm.language} onChange={e => handleFormChange('language', e.target.value)}
-                        placeholder="e.g. Hindi & English" className="input-field" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Course Icon (Emoji)</label>
-                      <input type="text" value={courseForm.thumbnailEmoji} onChange={e => handleFormChange('thumbnailEmoji', e.target.value)}
-                        placeholder="e.g. 🎵" className="input-field" />
-                    </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Language</label>
+                    <input type="text" value={courseForm.language} onChange={e => handleFormChange('language', e.target.value)}
+                      placeholder="e.g. Hindi & English" className="input-field" />
                   </div>
 
                   <div>
@@ -457,6 +528,38 @@ export default function DashboardPage() {
               {/* Step 2: Curriculum */}
               {formStep === 2 && (
                 <div className="space-y-4">
+                  {/* Study material */}
+                  <div className="rounded-xl p-4" style={{ background: '#FAFAF4', border: '1px solid #E2D5C4' }}>
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-ekam-cream-dim mb-2">
+                      <FileText size={13} className="text-ekam-gold" /> Study Material (PDF)
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                      {[
+                        ['none', 'No PDF material'],
+                        ['single', 'One PDF for whole course'],
+                        ['per-lesson', 'Separate PDF per lesson'],
+                      ].map(([value, label]) => (
+                        <button key={value} type="button" onClick={() => handleFormChange('studyMaterialType', value)}
+                          className="flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+                          style={{
+                            background: courseForm.studyMaterialType === value ? '#8C6210' : 'white',
+                            border: '1.5px solid ' + (courseForm.studyMaterialType === value ? '#8C6210' : '#E2D5C4'),
+                            color: courseForm.studyMaterialType === value ? '#FFFFFF' : '#7A6550',
+                          }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {courseForm.studyMaterialType === 'single' && (
+                      <input type="url" value={courseForm.studyMaterialUrl}
+                        onChange={e => handleFormChange('studyMaterialUrl', e.target.value)}
+                        placeholder="https://drive.google.com/... (link to a PDF)" className="input-field text-xs py-2" />
+                    )}
+                    {courseForm.studyMaterialType === 'per-lesson' && (
+                      <p className="text-xs text-ekam-muted">Add a PDF link for each lesson below, in its own row.</p>
+                    )}
+                  </div>
+
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-ekam-cream text-sm">Course Sections & Lessons</h3>
                     <button onClick={addSection} className="btn-outline text-xs px-3 py-1.5">
@@ -487,41 +590,54 @@ export default function DashboardPage() {
 
                       <div className="p-3 space-y-2">
                         {section.lessons.map((lesson, lIdx) => (
-                          <div key={lIdx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg"
-                            style={{ background: '#FFFFFF' }}>
-                            <input
-                              type="text"
-                              value={lesson.title}
-                              onChange={e => updateLesson(sIdx, lIdx, 'title', e.target.value)}
-                              placeholder="Lesson title"
-                              className="input-field text-xs py-2"
-                            />
-                            <div className="flex gap-2">
-                              <input
-                                type="url"
-                                value={lesson.videoUrl}
-                                onChange={e => updateLesson(sIdx, lIdx, 'videoUrl', e.target.value)}
-                                placeholder="YouTube URL"
-                                className="input-field text-xs py-2 flex-1"
-                              />
+                          <div key={lIdx} className="p-3 rounded-lg space-y-2" style={{ background: '#FFFFFF' }}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               <input
                                 type="text"
-                                value={lesson.duration}
-                                onChange={e => updateLesson(sIdx, lIdx, 'duration', e.target.value)}
-                                placeholder="MM:SS"
-                                className="input-field text-xs py-2 w-16"
+                                value={lesson.title}
+                                onChange={e => updateLesson(sIdx, lIdx, 'title', e.target.value)}
+                                placeholder="Lesson title"
+                                className="input-field text-xs py-2"
                               />
-                              <div className="flex items-center gap-1">
-                                <input type="checkbox" checked={lesson.free} onChange={e => updateLesson(sIdx, lIdx, 'free', e.target.checked)}
-                                  id={`free-${sIdx}-${lIdx}`} className="accent-ekam-gold" />
-                                <label htmlFor={`free-${sIdx}-${lIdx}`} className="text-xs text-ekam-muted">Free</label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="url"
+                                  value={lesson.videoUrl}
+                                  onChange={e => updateLesson(sIdx, lIdx, 'videoUrl', e.target.value)}
+                                  placeholder="YouTube URL"
+                                  className="input-field text-xs py-2 flex-1"
+                                />
+                                <input
+                                  type="text"
+                                  value={lesson.duration}
+                                  onChange={e => updateLesson(sIdx, lIdx, 'duration', e.target.value)}
+                                  placeholder="MM:SS"
+                                  className="input-field text-xs py-2 w-16"
+                                />
+                                <div className="flex items-center gap-1">
+                                  <input type="checkbox" checked={lesson.free} onChange={e => updateLesson(sIdx, lIdx, 'free', e.target.checked)}
+                                    id={`free-${sIdx}-${lIdx}`} className="accent-ekam-gold" />
+                                  <label htmlFor={`free-${sIdx}-${lIdx}`} className="text-xs text-ekam-muted">Free</label>
+                                </div>
+                                {section.lessons.length > 1 && (
+                                  <button onClick={() => removeLesson(sIdx, lIdx)} className="text-ekam-muted hover:text-red-400">
+                                    <X size={14} />
+                                  </button>
+                                )}
                               </div>
-                              {section.lessons.length > 1 && (
-                                <button onClick={() => removeLesson(sIdx, lIdx)} className="text-ekam-muted hover:text-red-400">
-                                  <X size={14} />
-                                </button>
-                              )}
                             </div>
+                            {courseForm.studyMaterialType === 'per-lesson' && (
+                              <div className="flex items-center gap-2">
+                                <FileText size={13} className="text-ekam-gold flex-shrink-0" />
+                                <input
+                                  type="url"
+                                  value={lesson.materialUrl}
+                                  onChange={e => updateLesson(sIdx, lIdx, 'materialUrl', e.target.value)}
+                                  placeholder="PDF link for this lesson"
+                                  className="input-field text-xs py-2 flex-1"
+                                />
+                              </div>
+                            )}
                           </div>
                         ))}
                         <button onClick={() => addLesson(sIdx)} className="text-xs text-ekam-gold hover:text-ekam-gold-light flex items-center gap-1 px-3 py-1.5 transition-colors">
@@ -546,16 +662,16 @@ export default function DashboardPage() {
                       className="input-field text-lg"
                       min="0"
                     />
-                    <p className="text-xs text-ekam-muted mt-1">Enter 0 for a free course. Ekam takes 20% commission on paid courses.</p>
+                    <p className="text-xs text-ekam-muted mt-1">Enter 0 for a free course. For paid courses, Ekam&apos;s team sets a commission rate during review — you&apos;ll see the exact rate once your course is approved.</p>
                   </div>
 
                   {/* Preview */}
                   <div className="rounded-xl p-5" style={{ background: '#FAFAF4', border: '1px solid #E2D5C4' }}>
                     <p className="text-xs text-ekam-muted uppercase tracking-wide mb-4">Course Preview</p>
                     <div className="flex items-start gap-4">
-                      <div className="w-16 h-12 rounded-lg flex items-center justify-center text-3xl"
+                      <div className="w-16 h-12 rounded-lg flex items-center justify-center"
                         style={{ background: 'linear-gradient(135deg, #F5EFE4, #EDE4D8)' }}>
-                        {courseForm.thumbnailEmoji}
+                        <CategoryIcon id={courseForm.category} size={22} className="text-ekam-gold" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-serif text-ekam-cream text-sm font-medium line-clamp-1">
@@ -633,9 +749,9 @@ function CourseRow({ course, onEdit, onDelete }) {
 
   return (
     <div className="card-base p-4 flex items-center gap-4">
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-        style={{ background: '#FAFAF4' }}>
-        {course.thumbnailEmoji}
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ background: 'rgba(140,98,16,0.08)' }}>
+        <CategoryIcon id={course.category} size={22} className="text-ekam-gold" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
@@ -645,12 +761,27 @@ function CourseRow({ course, onEdit, onDelete }) {
             {course.status?.toUpperCase()}
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-1 text-xs text-ekam-muted">
+        <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-ekam-muted">
           <span>{course.totalLessons} lessons</span>
           <span>•</span>
           <span>{formatPrice(course.price)}</span>
           <span>•</span>
           <span>{formatNumber(course.studentCount || 0)} students</span>
+          {course.studyMaterialType && course.studyMaterialType !== 'none' && (
+            <>
+              <span>•</span>
+              <span className="flex items-center gap-1"><FileText size={11} /> Study material</span>
+            </>
+          )}
+          {course.price > 0 && (
+            <>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Percent size={11} />
+                {course.commissionPct != null ? `${course.commissionPct}% commission` : 'Commission: pending review'}
+              </span>
+            </>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-1 flex-shrink-0">

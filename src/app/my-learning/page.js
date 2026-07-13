@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { courses } from '@/lib/data'
 import { formatNumber } from '@/lib/utils'
+import CategoryIcon from '@/components/icons/CategoryIcon'
+import { Mandala, PatternDots } from '@/components/decor/Decorative'
 
 function ProgressRing({ pct, size = 56, stroke = 4 }) {
   const r = (size - stroke * 2) / 2
@@ -88,8 +90,10 @@ export default function MyLearningPage() {
   return (
     <div className="min-h-screen pt-20" style={{ background: '#FDFAF4' }}>
       {/* Hero header */}
-      <div style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
+        <PatternDots />
+        <Mandala className="absolute -right-24 -top-20 w-72 h-72 opacity-30 pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <div className="flex items-start justify-between gap-6 flex-wrap">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -189,9 +193,13 @@ export default function MyLearningPage() {
                   return (
                     <div key={course.id} className="card-base overflow-hidden flex flex-col">
                       {/* Thumbnail */}
-                      <div className="relative" style={{ aspectRatio: '16/9', background: 'linear-gradient(135deg, #451a03, #450a0a)' }}>
+                      <div className="relative overflow-hidden" style={{ aspectRatio: '16/9', background: 'linear-gradient(135deg, #451a03, #450a0a)' }}>
+                        <CategoryIcon id={course.category} size={130} className="absolute inset-0 m-auto text-white opacity-[0.08]" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-5xl opacity-70">{course.thumbnailEmoji}</span>
+                          <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                            style={{ background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.22)' }}>
+                            <CategoryIcon id={course.category} size={26} className="text-white" />
+                          </div>
                         </div>
                         {/* Progress bar on top */}
                         <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: '#2E1A10' }}>
