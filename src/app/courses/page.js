@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Search, SlidersHorizontal, X, ChevronDown, Grid3X3, List } from 'lucide-react'
 import CourseCard from '@/components/courses/CourseCard'
 import CategoryIcon from '@/components/icons/CategoryIcon'
@@ -17,7 +18,8 @@ const sortOptions = [
   { value: 'price-high', label: 'Price: High to Low' },
 ]
 
-export default function CoursesPage() {
+function CoursesContent() {
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedLevel, setSelectedLevel] = useState('All Levels')
@@ -30,6 +32,13 @@ export default function CoursesPage() {
   useEffect(() => {
     setCourses([...staticCourses, ...getPublishedUserCourses()])
   }, [])
+
+  useEffect(() => {
+    const cat = searchParams.get('cat')
+    const search = searchParams.get('search')
+    if (cat) setSelectedCategory(cat)
+    if (search) setSearchQuery(search)
+  }, [searchParams])
 
   const filtered = useMemo(() => {
     let result = [...courses]
@@ -68,9 +77,9 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-20" style={{ background: '#FFFFFF' }}>
       {/* Header */}
-      <div className="relative overflow-hidden" style={{ background: '#F5EFE4', borderBottom: '1px solid #E2D5C4' }}>
+      <div className="relative overflow-hidden" style={{ background: '#FFFFFF', borderBottom: '1px solid #E2D5C4' }}>
         <PatternDots />
         <Mandala className="absolute -right-24 -top-20 w-72 h-72 opacity-40 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -79,7 +88,7 @@ export default function CoursesPage() {
               <div className="w-px h-4 bg-ekam-gold" />
               <span className="text-xs tracking-widest text-ekam-gold uppercase font-medium">All Courses</span>
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl font-semibold mb-3" style={{ color: '#1C0E04' }}>
+            <h1 className="text-4xl md:text-5xl font-semibold mb-3" style={{ color: '#1C0E04' }}>
               Explore Our Courses
             </h1>
             <p style={{ color: '#7A6550' }}>{formatNumber(courses.length)}+ courses taught by India&apos;s finest masters</p>
@@ -256,12 +265,20 @@ export default function CoursesPage() {
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
               <Search size={24} className="text-ekam-gold" />
             </div>
-            <h3 className="font-serif text-xl mb-2" style={{ color: '#1C0E04' }}>No courses found</h3>
+            <h3 className="text-xl mb-2" style={{ color: '#1C0E04' }}>No courses found</h3>
             <p className="mb-6" style={{ color: '#7A6550' }}>Try adjusting your search or filters</p>
             <button onClick={clearFilters} className="btn-outline">Clear All Filters</button>
           </div>
         )}
       </div>
     </div>
+  )
+}
+
+export default function CoursesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}><div className="loader-gold w-8 h-8" /></div>}>
+      <CoursesContent />
+    </Suspense>
   )
 }

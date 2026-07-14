@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --ekam-bg: #FDFAF4;
-  --ekam-surface: #F5EFE4;
+  --ekam-bg: #FFFFFF;
+  --ekam-surface: #F7F6F3;
   --ekam-card: #FFFFFF;
   --ekam-gold: #8C6210;
   --ekam-gold-bright: #D4A843;
@@ -28,20 +28,8 @@ body {
   position: relative;
 }
 
-/* Subtle film-grain texture so surfaces read as tactile/hand-finished rather than flat vector fills */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.025;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
 @layer base {
-  h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
+  h1, h2, h3 { font-family: 'Inter', system-ui, sans-serif; letter-spacing: -0.02em; }
 }
 
 @layer components {
@@ -53,28 +41,26 @@ body::before {
   }
 
   .section-label {
-    @apply inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase;
+    @apply inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] uppercase;
     color: #8C6210;
   }
 
-  .section-label::before { content: '—'; opacity: 0.5; }
-
   .section-title {
-    @apply font-serif font-semibold leading-[1.1];
+    @apply font-sans font-extrabold leading-[1.1] tracking-tight;
     color: #1C0E04;
   }
 
   /* ── Cards ── */
   .card-base {
-    @apply bg-white rounded-2xl transition-all duration-300;
-    border: 1px solid #E8DDD0;
-    box-shadow: 0 1px 4px rgba(139,94,10,0.04), 0 4px 16px rgba(139,94,10,0.03);
+    @apply bg-white rounded-lg transition-all duration-200;
+    border: 1px solid #E2DACB;
+    box-shadow: none;
   }
 
   .card-base:hover {
-    border-color: rgba(140,98,16,0.28);
-    box-shadow: 0 4px 12px rgba(139,94,10,0.08), 0 16px 40px rgba(139,94,10,0.07);
-    transform: translateY(-3px);
+    border-color: rgba(140,98,16,0.4);
+    box-shadow: 0 4px 14px rgba(139,94,10,0.10);
+    transform: translateY(-2px);
   }
 
   .card-elevated {
@@ -155,9 +141,9 @@ body::before {
   }
 
   .badge-green {
-    background: rgba(26,92,56,0.08);
-    color: #1A5C38;
-    border: 1px solid rgba(26,92,56,0.22);
+    background: rgba(184,70,15,0.08);
+    color: #B8460F;
+    border: 1px solid rgba(184,70,15,0.22);
   }
 
   .badge-muted {
@@ -187,7 +173,7 @@ body::before {
     @apply px-4 py-3 text-left font-semibold text-xs tracking-widest uppercase;
     color: #7A6550;
     border-bottom: 1.5px solid #E2D5C4;
-    background: #FAF6F0;
+    background: #FFFFFF;
   }
 
   .table-ekam td {

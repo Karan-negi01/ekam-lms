@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, ArrowRight, User, Mail, Lock, GraduationCap, BookOpen } from 'lucide-react'
 import AuthSidePanel from '@/components/layout/AuthSidePanel'
+import { findUserByEmail, saveUserToDirectory } from '@/lib/utils'
 
 function SignupForm() {
   const router = useRouter()
@@ -23,8 +24,10 @@ function SignupForm() {
     if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); setLoading(false); return }
     if (form.password.length < 6) { setError('Password must be at least 6 characters.'); setLoading(false); return }
     await new Promise(r => setTimeout(r, 900))
-    const user = { id: 'user-' + Date.now(), name: form.name, email: form.email, role: form.role }
+    const existing = findUserByEmail(form.email)
+    const user = { id: existing?.id || 'user-' + Date.now(), name: form.name, email: form.email, role: form.role }
     localStorage.setItem('ekam_user', JSON.stringify(user))
+    saveUserToDirectory(user)
     setLoading(false)
     router.push(form.role === 'instructor' ? '/dashboard' : '/')
   }
@@ -33,7 +36,7 @@ function SignupForm() {
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-16 md:pt-20">
       <AuthSidePanel />
 
-      <div className="flex items-center justify-center px-4 py-12" style={{ background: '#FDFAF4' }}>
+      <div className="flex items-center justify-center px-4 py-12" style={{ background: '#FFFFFF' }}>
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex lg:hidden flex-col items-center gap-2 mb-6">
@@ -46,7 +49,7 @@ function SignupForm() {
                 <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-75">एकम्</p>
               </div>
             </Link>
-            <h1 className="font-serif text-2xl mb-1" style={{ color: '#1C0E04' }}>Join Ekam</h1>
+            <h1 className="text-2xl mb-1" style={{ color: '#1C0E04' }}>Join Ekam</h1>
             <p className="text-sm" style={{ color: '#7A6550' }}>Start your cultural learning journey today</p>
           </div>
 
@@ -153,7 +156,7 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}><div className="loader-gold w-8 h-8" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}><div className="loader-gold w-8 h-8" /></div>}>
       <SignupForm />
     </Suspense>
   )

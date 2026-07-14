@@ -44,7 +44,7 @@ const posts = [
 
 export default function BlogPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Ekam Journal"
         title="Stories From the Tradition"
@@ -65,7 +65,7 @@ export default function BlogPage() {
                 <span className="absolute top-3 left-3 badge badge-gold bg-white/95 text-[10px]">{post.categoryLabel}</span>
               </div>
               <div className="p-6 flex-1 flex flex-col">
-                <h2 className="font-serif text-lg font-semibold leading-snug mb-2.5 transition-colors group-hover:text-ekam-gold" style={{ color: '#1C0E04' }}>
+                <h2 className="text-lg font-semibold leading-snug mb-2.5 transition-colors group-hover:text-ekam-gold" style={{ color: '#1C0E04' }}>
                   {post.title}
                 </h2>
                 <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: '#7A6550' }}>{post.excerpt}</p>

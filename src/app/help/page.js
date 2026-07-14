@@ -63,7 +63,7 @@ export default function HelpPage() {
     : current.faqs
 
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero label="Support" title="How Can We Help?" subtitle="Search common questions or browse by topic below." />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
@@ -100,8 +100,8 @@ export default function HelpPage() {
         </div>
 
         {/* Contact support */}
-        <div className="rounded-2xl p-8 text-center" style={{ background: '#FAF5ED', border: '1px solid #EDE4D8' }}>
-          <h3 className="font-serif text-xl font-semibold mb-2" style={{ color: '#1C0E04' }}>Still need help?</h3>
+        <div className="rounded-2xl p-8 text-center" style={{ background: '#FFFFFF', border: '1px solid #EDE4D8' }}>
+          <h3 className="text-xl font-semibold mb-2" style={{ color: '#1C0E04' }}>Still need help?</h3>
           <p className="text-sm mb-6" style={{ color: '#7A6550' }}>Our support team typically responds within one business day.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="mailto:contact@ekam.in" className="btn-gold text-sm"><Mail size={15} /> Email Support</a>

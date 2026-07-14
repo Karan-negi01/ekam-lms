@@ -96,3 +96,26 @@ export function markNotificationsRead(userId) {
   const list = getNotifications(userId).map(n => ({ ...n, read: true }))
   localStorage.setItem(`ekam_notifications_${userId}`, JSON.stringify(list))
 }
+
+// Fake "accounts table" so the same email always resolves to the same user id
+// and role across logins (there's no backend, so without this every fresh
+// login minted a new id and the instructor's own courses/notifications/
+// commission — all stored under their id — became unreachable).
+export function findUserByEmail(email) {
+  if (typeof window === 'undefined' || !email) return null
+  try {
+    const dir = JSON.parse(localStorage.getItem('ekam_users') || '{}')
+    return dir[email.toLowerCase()] || null
+  } catch {
+    return null
+  }
+}
+
+export function saveUserToDirectory(user) {
+  if (typeof window === 'undefined' || !user?.email) return
+  try {
+    const dir = JSON.parse(localStorage.getItem('ekam_users') || '{}')
+    dir[user.email.toLowerCase()] = { id: user.id, name: user.name, role: user.role }
+    localStorage.setItem('ekam_users', JSON.stringify(dir))
+  } catch {}
+}

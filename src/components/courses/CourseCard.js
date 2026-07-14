@@ -1,17 +1,17 @@
 import Link from 'next/link'
-import { Star, Clock, Users, BookOpen, BadgeCheck, Play } from 'lucide-react'
+import { Star, Play } from 'lucide-react'
 import { formatPrice, formatNumber, getDiscount } from '@/lib/utils'
 import CategoryIcon from '@/components/icons/CategoryIcon'
 
 const thumbGrads = {
-  'from-amber-900 via-red-900 to-amber-800': 'linear-gradient(135deg, #451a03 0%, #450a0a 60%, #3b1203 100%)',
-  'from-red-900 via-rose-900 to-pink-900':   'linear-gradient(135deg, #450a0a 0%, #4c0519 60%, #500724 100%)',
-  'from-green-900 via-emerald-900 to-teal-900':'linear-gradient(135deg, #14532d 0%, #064e3b 60%, #134e4a 100%)',
-  'from-orange-900 via-amber-900 to-yellow-900':'linear-gradient(135deg, #431407 0%, #451a03 60%, #422006 100%)',
-  'from-purple-900 via-violet-900 to-indigo-900':'linear-gradient(135deg, #3b0764 0%, #4c1d95 60%, #312e81 100%)',
-  'from-pink-900 via-rose-900 to-red-900':   'linear-gradient(135deg, #500724 0%, #4c0519 60%, #450a0a 100%)',
-  'from-red-900 via-orange-900 to-amber-900':'linear-gradient(135deg, #450a0a 0%, #431407 60%, #451a03 100%)',
-  'from-yellow-900 via-amber-900 to-orange-900':'linear-gradient(135deg, #422006 0%, #451a03 60%, #431407 100%)',
+  'from-amber-900 via-red-900 to-amber-800': 'linear-gradient(135deg, #452007 0%, #5C2E0A 60%, #341704 100%)',
+  'from-red-900 via-rose-900 to-pink-900':   'linear-gradient(135deg, #4A1F0D 0%, #6B3212 60%, #38150A 100%)',
+  'from-green-900 via-emerald-900 to-teal-900':'linear-gradient(135deg, #3D2408 0%, #55350C 60%, #2C1804 100%)',
+  'from-orange-900 via-amber-900 to-yellow-900':'linear-gradient(135deg, #4E2A05 0%, #6B3D0C 60%, #391F03 100%)',
+  'from-purple-900 via-violet-900 to-indigo-900':'linear-gradient(135deg, #43200A 0%, #5E2F10 60%, #301707 100%)',
+  'from-pink-900 via-rose-900 to-red-900':   'linear-gradient(135deg, #4A1C06 0%, #632808 60%, #341303 100%)',
+  'from-red-900 via-orange-900 to-amber-900':'linear-gradient(135deg, #3F2308 0%, #58330D 60%, #2E1805 100%)',
+  'from-yellow-900 via-amber-900 to-orange-900':'linear-gradient(135deg, #4C2E08 0%, #6B420E 60%, #351F04 100%)',
 }
 
 export default function CourseCard({ course, compact = false }) {
@@ -48,18 +48,15 @@ export default function CourseCard({ course, compact = false }) {
           </div>
 
           {/* Badges row */}
-          <div className="absolute top-2.5 left-2.5 flex gap-1.5">
-            {course.bestseller && (
-              <span className="badge badge-gold bg-white/95 text-[10px] shadow-sm">⚡ Bestseller</span>
-            )}
-            {course.featured && !course.bestseller && (
+          {course.featured && !course.bestseller && (
+            <div className="absolute top-2.5 left-2.5">
               <span className="badge badge-saffron bg-white/95 text-[10px] shadow-sm">✦ Featured</span>
-            )}
-          </div>
+            </div>
+          )}
 
           {discount > 0 && (
             <div className="absolute top-2.5 right-2.5">
-              <span className="badge badge-green bg-white/95 text-[10px] font-bold shadow-sm">{discount}% OFF</span>
+              <span className="badge badge-gold bg-white/95 text-[10px] font-bold shadow-sm">{discount}% OFF</span>
             </div>
           )}
 
@@ -71,67 +68,46 @@ export default function CourseCard({ course, compact = false }) {
         </div>
 
         {/* ── Content ── */}
-        <div className="p-4 flex-1 flex flex-col">
+        <div className="p-3 flex-1 flex flex-col">
 
           {/* Title */}
-          <h3 className="font-serif font-semibold text-[15px] leading-snug mb-2 line-clamp-2 transition-colors duration-200 group-hover:text-ekam-gold"
+          <h3 className="font-bold text-sm leading-snug mb-1 line-clamp-2 transition-colors duration-200 group-hover:text-ekam-gold"
             style={{ color: '#1C0E04' }}>
             {course.title}
           </h3>
 
           {/* Instructor */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
-              {course.instructor?.initials?.charAt(0) || 'I'}
-            </div>
-            <span className="text-xs truncate" style={{ color: '#7A6550' }}>
-              {course.instructor?.name}
-            </span>
-            {course.instructor?.verified && (
-              <BadgeCheck size={13} className="flex-shrink-0" style={{ color: '#8C6210' }} />
-            )}
-          </div>
+          <p className="text-xs truncate mb-1.5" style={{ color: '#6B5D4D' }}>
+            {course.instructor?.name}
+          </p>
 
-          {/* Rating + students */}
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex items-center gap-1">
-              <Star size={12} fill="#F59E0B" className="text-amber-500" />
-              <span className="text-xs font-bold text-amber-600">{course.rating}</span>
-              <span className="text-xs" style={{ color: '#B0A090' }}>({formatNumber(course.reviewCount)})</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs" style={{ color: '#B0A090' }}>
-              <Users size={11} />
-              <span>{formatNumber(course.studentCount)}</span>
-            </div>
-            {!compact && (
-              <div className="flex items-center gap-1 text-xs" style={{ color: '#B0A090' }}>
-                <Clock size={11} />
-                <span>{course.duration}</span>
-              </div>
+          {/* Rating row — bestseller + stars + count, one line, Udemy-style */}
+          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+            {course.bestseller && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                style={{ background: '#FCEADC', color: '#B8460F' }}>Bestseller</span>
             )}
+            <span className="text-xs font-bold" style={{ color: '#B4690A' }}>{course.rating}</span>
+            <div className="flex items-center gap-0.5">
+              {[0,1,2,3,4].map(i => (
+                <Star key={i} size={11} fill="#E5A729" strokeWidth={0} />
+              ))}
+            </div>
+            <span className="text-xs" style={{ color: '#7A6550' }}>({formatNumber(course.reviewCount)})</span>
           </div>
 
           {!compact && (
-            <div className="flex items-center gap-1.5 text-xs mb-3" style={{ color: '#B0A090' }}>
-              <BookOpen size={11} />
-              <span>{course.totalLessons} lessons · {course.language}</span>
-            </div>
+            <p className="text-[11px] mb-1.5" style={{ color: '#7A6550' }}>
+              {course.duration} · {course.totalLessons} lessons · {course.language}
+            </p>
           )}
 
           {/* Price row */}
-          <div className="mt-auto pt-3 flex items-center justify-between"
-            style={{ borderTop: '1px solid #F0E8DC' }}>
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold" style={{ color: '#8C6210' }}>{formatPrice(course.price)}</span>
-              {course.originalPrice > course.price && (
-                <span className="text-xs line-through" style={{ color: '#C4B09A' }}>{formatPrice(course.originalPrice)}</span>
-              )}
-            </div>
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-              style={{ background: 'rgba(140,98,16,0.08)' }}>
-              <Play size={12} fill="#8C6210" className="text-ekam-gold ml-0.5" />
-            </div>
+          <div className="mt-auto pt-1.5 flex items-center gap-2">
+            <span className="text-sm font-extrabold" style={{ color: '#1C0E04' }}>{formatPrice(course.price)}</span>
+            {course.originalPrice > course.price && (
+              <span className="text-xs line-through" style={{ color: '#B0A090' }}>{formatPrice(course.originalPrice)}</span>
+            )}
           </div>
         </div>
       </div>

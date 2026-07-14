@@ -23,7 +23,7 @@ export default function InstructorsPage() {
   }, [query, category])
 
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Maestros"
         title="Meet the Masters of Ekam"
@@ -78,7 +78,7 @@ export default function InstructorsPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-serif font-semibold text-base leading-tight mb-0.5" style={{ color: '#1C0E04' }}>{inst.name}</h3>
+                    <h3 className="font-semibold text-base leading-tight mb-0.5" style={{ color: '#1C0E04' }}>{inst.name}</h3>
                     <p className="text-xs font-medium mb-2" style={{ color: '#8C6210' }}>{inst.title}</p>
                     <div className="flex items-center gap-3 text-xs" style={{ color: '#7A6550' }}>
                       <span className="flex items-center gap-1"><Star size={11} className="fill-amber-500 text-amber-500" />{inst.rating}</span>
@@ -100,7 +100,7 @@ export default function InstructorsPage() {
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
               <Search size={24} className="text-ekam-gold" />
             </div>
-            <h3 className="font-serif text-xl mb-2" style={{ color: '#1C0E04' }}>No instructors found</h3>
+            <h3 className="text-xl mb-2" style={{ color: '#1C0E04' }}>No instructors found</h3>
             <p style={{ color: '#7A6550' }}>Try a different search or tradition.</p>
           </div>
         )}

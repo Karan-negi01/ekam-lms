@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       colors: {
         ekam: {
-          bg: '#FDFAF4',
-          surface: '#F5EFE4',
+          bg: '#FFFFFF',
+          surface: '#F7F6F3',
           card: '#FFFFFF',
           'card-hover': '#FFFEF8',
           gold: '#8C6210',
@@ -25,14 +25,12 @@ module.exports = {
           border: '#E2D5C4',
           'border-light': '#EDE4D8',
           red: '#B01818',
-          'green-deep': '#1A5C38',
-          teal: '#1A4A5A',
+          rust: '#B8460F',
         },
       },
       fontFamily: {
-        serif: ['"Cormorant Garamond"', '"Playfair Display"', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['"Cinzel"', '"Cormorant Garamond"', 'serif'],
+        display: ['"Cinzel"', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

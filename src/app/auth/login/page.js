@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, ArrowRight, Lock, Mail } from 'lucide-react'
 import AuthSidePanel from '@/components/layout/AuthSidePanel'
+import { findUserByEmail, saveUserToDirectory } from '@/lib/utils'
 
 function LoginForm() {
   const router = useRouter()
@@ -26,16 +27,23 @@ function LoginForm() {
     setLoading(true)
     setError('')
     await new Promise(r => setTimeout(r, 800))
-    const isAdmin = form.email.toLowerCase().includes('admin')
-    const isInstructor = form.email.toLowerCase().includes('instructor') || form.email.toLowerCase().includes('teacher')
     if (!form.email || !form.password) { setError('Please fill in all fields.'); setLoading(false); return }
-    const user = {
-      id: 'user-' + Date.now(),
-      name: form.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      email: form.email,
-      role: isAdmin ? 'admin' : isInstructor ? 'instructor' : 'student',
+    const existing = findUserByEmail(form.email)
+    let user
+    if (existing) {
+      user = { id: existing.id, name: existing.name, email: form.email, role: existing.role }
+    } else {
+      const isAdmin = form.email.toLowerCase().includes('admin')
+      const isInstructor = form.email.toLowerCase().includes('instructor') || form.email.toLowerCase().includes('teacher')
+      user = {
+        id: 'user-' + Date.now(),
+        name: form.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        email: form.email,
+        role: isAdmin ? 'admin' : isInstructor ? 'instructor' : 'student',
+      }
     }
     localStorage.setItem('ekam_user', JSON.stringify(user))
+    saveUserToDirectory(user)
     setLoading(false)
     router.push(redirect)
   }
@@ -47,7 +55,9 @@ function LoginForm() {
       admin: { email: 'admin@ekam.in', password: 'demo123', role: 'admin', name: 'Ekam Admin' },
     }
     const demo = demos[role]
-    localStorage.setItem('ekam_user', JSON.stringify({ id: 'demo-' + role, ...demo }))
+    const user = { id: 'demo-' + role, ...demo }
+    localStorage.setItem('ekam_user', JSON.stringify(user))
+    saveUserToDirectory(user)
     router.push(role === 'admin' ? '/admin' : role === 'instructor' ? '/dashboard' : '/')
   }
 
@@ -56,7 +66,7 @@ function LoginForm() {
       <AuthSidePanel />
 
       <div className="flex items-center justify-center px-4 py-24 lg:py-16 relative"
-        style={{ background: '#FDFAF4' }}>
+        style={{ background: '#FFFFFF' }}>
         <div className="w-full max-w-md relative z-10">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex lg:hidden flex-col items-center gap-2 mb-6">
@@ -69,7 +79,7 @@ function LoginForm() {
                 <p className="text-xs tracking-[0.3em] text-ekam-gold opacity-75">एकम्</p>
               </div>
             </Link>
-            <h1 className="font-serif text-2xl mb-1" style={{ color: '#1C0E04' }}>Welcome Back</h1>
+            <h1 className="text-2xl mb-1" style={{ color: '#1C0E04' }}>Welcome Back</h1>
             <p className="text-sm" style={{ color: '#7A6550' }}>Sign in to continue your learning journey</p>
           </div>
 
@@ -165,7 +175,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}><div className="loader-gold w-8 h-8" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}><div className="loader-gold w-8 h-8" /></div>}>
       <LoginForm />
     </Suspense>
   )

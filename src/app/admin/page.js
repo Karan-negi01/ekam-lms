@@ -108,7 +108,7 @@ export default function AdminPage() {
     { label: 'Total Courses', value: adminStats.totalCourses, sub: 'Platform & user courses', icon: BookOpen, color: '#D4A843' },
     { label: 'Active Students', value: formatNumber(adminStats.totalStudents), sub: '+2,400 this month', icon: Users, color: '#E8622A' },
     { label: 'Instructors', value: adminStats.totalInstructors, sub: `${pendingCourses.length} pending approval`, icon: Star, color: '#F0C96A' },
-    { label: 'Monthly Revenue', value: adminStats.revenue, sub: adminStats.monthlyGrowth + ' vs last month', icon: TrendingUp, color: '#4CAF72' },
+    { label: 'Monthly Revenue', value: adminStats.revenue, sub: adminStats.monthlyGrowth + ' vs last month', icon: TrendingUp, color: '#B8460F' },
   ]
 
   const filteredCourses = [...allCourses, ...allUserCourses].filter(c =>
@@ -117,16 +117,16 @@ export default function AdminPage() {
   )
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
 
   return (
-    <div className="min-h-screen pt-16 flex" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-16 flex" style={{ background: '#FFFFFF' }}>
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ekam-border pt-8 pb-6 px-4 flex-shrink-0"
-        style={{ background: '#F5EFE4', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
+        style={{ background: '#FFFFFF', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
         <div className="flex items-center gap-3 px-2 mb-8 pb-6 border-b border-ekam-border">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
             style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
@@ -179,7 +179,7 @@ export default function AdminPage() {
                   <Shield size={16} className="text-ekam-gold" />
                   <span className="text-xs tracking-widest text-ekam-gold uppercase font-medium">Admin Panel</span>
                 </div>
-                <h1 className="font-serif text-3xl text-ekam-cream font-semibold">Platform Overview</h1>
+                <h1 className="text-3xl text-ekam-cream font-semibold">Platform Overview</h1>
               </div>
               <div className="flex items-center gap-2">
                 {pendingCourses.length > 0 && (
@@ -214,7 +214,7 @@ export default function AdminPage() {
             {allUserCourses.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-serif text-xl text-ekam-cream">User-Submitted Courses</h2>
+                  <h2 className="text-xl text-ekam-cream">User-Submitted Courses</h2>
                   <button onClick={() => setSection('approvals')} className="text-xs text-ekam-gold hover:text-ekam-gold-light transition-colors">
                     View all →
                   </button>
@@ -230,7 +230,7 @@ export default function AdminPage() {
 
             {/* Platform Courses */}
             <div>
-              <h2 className="font-serif text-xl text-ekam-cream mb-4">Platform Courses</h2>
+              <h2 className="text-xl text-ekam-cream mb-4">Platform Courses</h2>
               <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
                 <table className="table-ekam">
                   <thead style={{ background: '#FAFAF4' }}>
@@ -276,7 +276,7 @@ export default function AdminPage() {
         {section === 'courses' && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="font-serif text-3xl text-ekam-cream font-semibold">All Courses</h1>
+              <h1 className="text-3xl text-ekam-cream font-semibold">All Courses</h1>
               <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ekam-muted" />
                 <input
@@ -306,7 +306,7 @@ export default function AdminPage() {
                 <tbody style={{ background: '#FFFFFF' }}>
                   {filteredCourses.map(course => {
                     const sc = {
-                      published: { bg: 'rgba(76,175,114,0.1)', text: '#4CAF72' },
+                      published: { bg: 'rgba(184,70,15,0.1)', text: '#B8460F' },
                       pending: { bg: 'rgba(232,98,42,0.1)', text: '#E8622A' },
                       draft: { bg: 'rgba(122,107,82,0.1)', text: '#9B8B6E' },
                     }[course.status || 'published']
@@ -361,7 +361,7 @@ export default function AdminPage() {
         {/* Instructors */}
         {section === 'instructors' && (
           <div>
-            <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-6">Instructors</h1>
+            <h1 className="text-3xl text-ekam-cream font-semibold mb-6">Instructors</h1>
             <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #E2D5C4' }}>
               <table className="table-ekam">
                 <thead style={{ background: '#FAFAF4' }}>
@@ -410,7 +410,7 @@ export default function AdminPage() {
         {section === 'approvals' && (
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <h1 className="font-serif text-3xl text-ekam-cream font-semibold">Pending Approvals</h1>
+              <h1 className="text-3xl text-ekam-cream font-semibold">Pending Approvals</h1>
               {pendingCourses.length > 0 && (
                 <span className="badge badge-saffron">{pendingCourses.length} pending</span>
               )}
@@ -419,7 +419,7 @@ export default function AdminPage() {
             {pendingCourses.length === 0 ? (
               <div className="card-base p-12 text-center">
                 <CheckCircle2 size={40} className="text-ekam-gold mx-auto mb-3" />
-                <h3 className="font-serif text-xl text-ekam-cream mb-2">All Caught Up!</h3>
+                <h3 className="text-xl text-ekam-cream mb-2">All Caught Up!</h3>
                 <p className="text-ekam-muted">No courses pending review at the moment.</p>
               </div>
             ) : (
@@ -436,10 +436,10 @@ export default function AdminPage() {
         {/* Students */}
         {section === 'students' && (
           <div>
-            <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-6">Students</h1>
+            <h1 className="text-3xl text-ekam-cream font-semibold mb-6">Students</h1>
             <div className="card-base p-12 text-center">
               <Users size={40} className="text-ekam-gold mx-auto mb-3" />
-              <h3 className="font-serif text-xl text-ekam-cream mb-2">Student Management</h3>
+              <h3 className="text-xl text-ekam-cream mb-2">Student Management</h3>
               <p className="text-ekam-muted">Student enrollment data and analytics will be available once the platform goes live.</p>
             </div>
           </div>
@@ -448,10 +448,10 @@ export default function AdminPage() {
         {/* Revenue */}
         {section === 'revenue' && (
           <div>
-            <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-6">Revenue Analytics</h1>
+            <h1 className="text-3xl text-ekam-cream font-semibold mb-6">Revenue Analytics</h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               {[
-                { label: 'Total Revenue', value: adminStats.revenue, color: '#4CAF72' },
+                { label: 'Total Revenue', value: adminStats.revenue, color: '#B8460F' },
                 { label: 'This Month', value: '₹3,85,000', color: '#D4A843' },
                 { label: 'Instructor Payouts', value: '₹30,80,000', color: '#E8622A' },
               ].map((item, i) => (
@@ -486,7 +486,7 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false, defa
             <CategoryIcon id={course.category} size={26} className="text-ekam-gold" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-serif text-base text-ekam-cream font-medium mb-0.5">{course.title}</h3>
+            <h3 className="text-base text-ekam-cream font-medium mb-0.5">{course.title}</h3>
             <p className="text-xs text-ekam-gold mb-1">{course.instructor?.name}</p>
             <div className="flex flex-wrap gap-2 text-xs text-ekam-muted mb-1">
               <span>{course.totalLessons} lessons</span>
@@ -511,8 +511,8 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false, defa
           {!approving ? (
             <>
               <button onClick={() => setApproving(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-green-400 transition-all"
-                style={{ background: 'rgba(76,175,114,0.1)', border: '1px solid rgba(76,175,114,0.3)' }}>
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{ background: 'rgba(184,70,15,0.1)', border: '1px solid rgba(184,70,15,0.3)', color: '#B8460F' }}>
                 <CheckCircle2 size={13} /> Approve
               </button>
               <button onClick={() => onReject(course.id)}

@@ -43,7 +43,7 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#F5EFE4', borderTop: '1px solid #E2D5C4' }}>
+    <footer style={{ background: '#FFFFFF', borderTop: '1px solid #E2D5C4' }}>
       <div className="h-px w-full" style={{ background: 'linear-gradient(to right, transparent, rgba(140,98,16,0.35), transparent)' }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-8">

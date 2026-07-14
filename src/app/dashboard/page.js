@@ -187,7 +187,7 @@ export default function DashboardPage() {
     { label: 'Total Courses', value: myCourses.length, icon: BookOpen, color: '#D4A843' },
     { label: 'Total Students', value: formatNumber(myCourses.reduce((a, c) => a + (c.studentCount || 0), 0)), icon: Users, color: '#E8622A' },
     { label: 'Avg Rating', value: myCourses.length ? (myCourses.reduce((a, c) => a + c.rating, 0) / myCourses.length || 0).toFixed(1) : '—', icon: Star, color: '#F0C96A' },
-    { label: 'Est. Revenue', value: formatPrice(myCourses.reduce((a, c) => a + (c.price * c.studentCount || 0), 0)), icon: DollarSign, color: '#4CAF72' },
+    { label: 'Est. Revenue', value: formatPrice(myCourses.reduce((a, c) => a + (c.price * c.studentCount || 0), 0)), icon: DollarSign, color: '#B8460F' },
   ]
 
   const formatRupees = (n) => `₹${Math.round(n).toLocaleString('en-IN')}`
@@ -201,16 +201,16 @@ export default function DashboardPage() {
   const netPayout = grossRevenue - totalCommission
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
 
   return (
-    <div className="min-h-screen pt-16 flex" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-16 flex" style={{ background: '#FFFFFF' }}>
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ekam-border pt-8 pb-6 px-4 flex-shrink-0"
-        style={{ background: '#F5EFE4', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
+        style={{ background: '#FFFFFF', minHeight: 'calc(100vh - 64px)', position: 'sticky', top: '64px', height: 'calc(100vh - 64px)' }}>
         {/* User info */}
         <div className="flex items-center gap-3 px-2 mb-8 pb-6 border-b border-ekam-border">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
@@ -258,7 +258,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="font-serif text-3xl text-ekam-cream font-semibold">Instructor Dashboard</h1>
+                <h1 className="text-3xl text-ekam-cream font-semibold">Instructor Dashboard</h1>
                 <p className="text-ekam-muted mt-1">Welcome back, {user.name?.split(' ')[0]}</p>
               </div>
               <button onClick={() => setShowCreateModal(true)} className="btn-gold">
@@ -285,7 +285,7 @@ export default function DashboardPage() {
             {/* Recent courses */}
             {myCourses.length > 0 ? (
               <div>
-                <h2 className="font-serif text-xl text-ekam-cream mb-4">Your Courses</h2>
+                <h2 className="text-xl text-ekam-cream mb-4">Your Courses</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {myCourses.slice(0, 4).map(course => (
                     <CourseRow key={course.id} course={course} onEdit={editCourse} onDelete={deleteCourse} />
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
                   <GraduationCap size={28} className="text-ekam-gold" />
                 </div>
-                <h3 className="font-serif text-xl text-ekam-cream mb-2">Create Your First Course</h3>
+                <h3 className="text-xl text-ekam-cream mb-2">Create Your First Course</h3>
                 <p className="text-ekam-muted mb-6 max-w-sm mx-auto">
                   Share your expertise with thousands of learners. Create a course in any cultural art form.
                 </p>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
         {activeSection === 'courses' && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="font-serif text-3xl text-ekam-cream font-semibold">My Courses</h1>
+              <h1 className="text-3xl text-ekam-cream font-semibold">My Courses</h1>
               <button onClick={() => setShowCreateModal(true)} className="btn-gold">
                 <Plus size={16} /> New Course
               </button>
@@ -343,7 +343,7 @@ export default function DashboardPage() {
         {/* Earnings */}
         {activeSection === 'earnings' && (
           <div>
-            <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-8">Earnings</h1>
+            <h1 className="text-3xl text-ekam-cream font-semibold mb-8">Earnings</h1>
 
             {paidCourses.length === 0 ? (
               <div className="card-base p-8 text-center">
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="card-base p-5">
                     <p className="text-xs text-ekam-muted uppercase tracking-wide mb-2">Your Payout</p>
-                    <p className="text-2xl font-semibold" style={{ color: '#4CAF72' }}>{formatRupees(netPayout)}</p>
+                    <p className="text-2xl font-semibold" style={{ color: '#B8460F' }}>{formatRupees(netPayout)}</p>
                   </div>
                 </div>
 
@@ -411,7 +411,7 @@ export default function DashboardPage() {
         {/* Students */}
         {activeSection === 'students' && (
           <div>
-            <h1 className="font-serif text-3xl text-ekam-cream font-semibold mb-8">My Students</h1>
+            <h1 className="text-3xl text-ekam-cream font-semibold mb-8">My Students</h1>
             <div className="card-base p-8 text-center">
               <Users size={32} className="text-ekam-gold mx-auto mb-3" />
               <p className="text-ekam-cream font-medium mb-1">Student Analytics</p>
@@ -430,7 +430,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between p-6 border-b border-ekam-border sticky top-0 z-10"
               style={{ background: '#FFFFFF' }}>
               <div>
-                <h2 className="font-serif text-xl text-ekam-cream">
+                <h2 className="text-xl text-ekam-cream">
                   {editingCourse ? 'Edit Course' : 'Create New Course'}
                 </h2>
                 <p className="text-xs text-ekam-muted mt-0.5">Step {formStep} of 3</p>
@@ -448,11 +448,11 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setFormStep(i + 1)}
                     className={`flex items-center gap-2 text-xs font-medium transition-colors ${
-                      formStep === i + 1 ? 'text-ekam-gold' : formStep > i + 1 ? 'text-ekam-green' : 'text-ekam-muted'
+                      formStep === i + 1 ? 'text-ekam-gold' : formStep > i + 1 ? 'text-ekam-rust' : 'text-ekam-muted'
                     }`}
                   >
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                      formStep === i + 1 ? 'bg-ekam-gold text-white' : formStep > i + 1 ? 'bg-green-700 text-white' : 'bg-ekam-border text-ekam-muted'
+                      formStep === i + 1 ? 'bg-ekam-gold text-white' : formStep > i + 1 ? 'bg-ekam-rust text-white' : 'bg-ekam-border text-ekam-muted'
                     }`}>
                       {formStep > i + 1 ? '✓' : i + 1}
                     </div>
@@ -666,15 +666,15 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Preview */}
-                  <div className="rounded-xl p-5" style={{ background: '#FAFAF4', border: '1px solid #E2D5C4' }}>
+                  <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
                     <p className="text-xs text-ekam-muted uppercase tracking-wide mb-4">Course Preview</p>
                     <div className="flex items-start gap-4">
                       <div className="w-16 h-12 rounded-lg flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #F5EFE4, #EDE4D8)' }}>
+                        style={{ background: '#F7F6F3' }}>
                         <CategoryIcon id={courseForm.category} size={22} className="text-ekam-gold" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-serif text-ekam-cream text-sm font-medium line-clamp-1">
+                        <p className="text-ekam-cream text-sm font-medium line-clamp-1">
                           {courseForm.title || 'Course Title'}
                         </p>
                         <p className="text-xs text-ekam-gold mt-0.5">{user.name}</p>
@@ -742,7 +742,7 @@ export default function DashboardPage() {
 function CourseRow({ course, onEdit, onDelete }) {
   const statusColors = {
     pending: { bg: 'rgba(232,98,42,0.1)', border: 'rgba(232,98,42,0.3)', text: '#E8622A' },
-    published: { bg: 'rgba(76,175,114,0.1)', border: 'rgba(76,175,114,0.3)', text: '#4CAF72' },
+    published: { bg: 'rgba(184,70,15,0.1)', border: 'rgba(184,70,15,0.3)', text: '#B8460F' },
     draft: { bg: 'rgba(122,107,82,0.1)', border: 'rgba(122,107,82,0.3)', text: '#9B8B6E' },
   }
   const sc = statusColors[course.status] || statusColors.pending

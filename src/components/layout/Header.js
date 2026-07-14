@@ -3,21 +3,19 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Search, Menu, X, ChevronDown, BookOpen, LayoutDashboard, Shield, LogOut, User, Bell, CheckCircle2, XCircle } from 'lucide-react'
 import { getNotifications, markNotificationsRead } from '@/lib/utils'
 
 const navLinks = [
-  { label: 'Courses', href: '/courses' },
   { label: 'Categories', href: '/courses?view=categories' },
   { label: 'Instructors', href: '/instructors' },
-  { label: 'About Ekam', href: '/about' },
 ]
 
 export default function Header() {
+  const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
@@ -26,7 +24,7 @@ export default function Header() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20)
+    const handleScroll = () => setIsScrolled(window.scrollY > 10)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -64,81 +62,91 @@ export default function Header() {
     setUserMenuOpen(false)
   }
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    router.push(searchQuery.trim() ? `/courses?search=${encodeURIComponent(searchQuery.trim())}` : '/courses')
+  }
+
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-white"
       style={{
-        background: '#450013',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: isScrolled ? '0 2px 20px rgba(0,0,0,0.25)' : 'none',
+        borderBottom: '1px solid #ECE7DD',
+        boxShadow: isScrolled ? '0 1px 12px rgba(20,20,20,0.06)' : 'none',
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center gap-4 h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
-            <Image
-              src="/ekam-logo-crop.png"
-              alt="Ekam"
-              width={1056}
-              height={588}
-              priority
-              className="h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-105"
-            />
+          <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
+            <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0" style={{ background: '#450013' }}>
+              <Image src="/ekam-icon.png" alt="" width={506} height={558} priority className="w-full h-full object-cover" />
+            </div>
+            <span className="font-sans text-lg font-extrabold tracking-tight hidden sm:block" style={{ color: '#171310' }}>Ekam</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Categories link (desktop) */}
+          <nav className="hidden lg:flex items-center gap-1 flex-shrink-0">
             {navLinks.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-                style={
-                  pathname === link.href
-                    ? { color: '#E8C060', background: 'rgba(212,168,67,0.15)' }
-                    : { color: 'rgba(255,255,255,0.65)' }
-                }
-                onMouseEnter={e => { if (pathname !== link.href) { e.currentTarget.style.color = '#FFFFFF'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' } }}
-                onMouseLeave={e => { if (pathname !== link.href) { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; e.currentTarget.style.background = 'transparent' } }}
+                className="px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-150 whitespace-nowrap"
+                style={pathname === link.href.split('?')[0] ? { color: '#8C6210', background: '#FBF3E3' } : { color: '#4A4438' }}
+                onMouseEnter={e => { if (pathname !== link.href.split('?')[0]) e.currentTarget.style.background = '#F5F3EE' }}
+                onMouseLeave={e => { if (pathname !== link.href.split('?')[0]) e.currentTarget.style.background = 'transparent' }}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
+          {/* Persistent search bar */}
+          <form onSubmit={handleSearch} className="flex-1 hidden md:block max-w-xl">
+            <div className="relative rounded-full overflow-hidden transition-all duration-150"
+              style={{ border: '1.5px solid #171310' }}>
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ekam-muted" />
+              <input
+                type="text"
+                placeholder="Search for anything"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-transparent text-sm outline-none"
+                style={{ color: '#171310' }}
+              />
+            </div>
+          </form>
+
           {/* Right side */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200"
-              style={{ color: 'rgba(255,255,255,0.7)' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#E8C060'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'transparent' }}
-            >
-              <Search size={18} />
-            </button>
+          <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+            <Link href="/auth/signup?role=instructor"
+              className="hidden lg:block px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-150 whitespace-nowrap"
+              style={{ color: '#4A4438' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#F5F3EE' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+              Teach on Ekam
+            </Link>
 
             {user ? (
               <>
                 <div className="relative">
                   <button onClick={toggleNotifications}
-                    className="w-9 h-9 relative flex items-center justify-center rounded-lg transition-all duration-200"
-                    style={{ color: 'rgba(255,255,255,0.7)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#E8C060'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'transparent' }}
+                    className="w-9 h-9 relative flex items-center justify-center rounded-lg transition-all duration-150"
+                    style={{ color: '#5A5346' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#F5F3EE' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                   >
                     <Bell size={18} />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-ekam-saffron"></span>
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: '#C44015' }}></span>
                     )}
                   </button>
 
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-xl overflow-hidden shadow-lg z-50 bg-white"
-                      style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 32px rgba(139,94,10,0.12)' }}>
-                      <div className="px-4 py-3" style={{ borderBottom: '1px solid #EDE4D8' }}>
-                        <p className="text-sm font-medium text-ekam-cream">Notifications</p>
+                    <div className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-xl overflow-hidden bg-white"
+                      style={{ border: '1px solid #EAE4D8', boxShadow: '0 10px 32px rgba(20,20,20,0.10)' }}>
+                      <div className="px-4 py-3" style={{ borderBottom: '1px solid #F0EBE0' }}>
+                        <p className="text-sm font-bold" style={{ color: '#171310' }}>Notifications</p>
                       </div>
                       <div className="max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
@@ -146,16 +154,16 @@ export default function Header() {
                         ) : (
                           notifications.map(n => (
                             <div key={n.id} className="flex items-start gap-3 px-4 py-3"
-                              style={{ borderBottom: '1px solid #F5EFE4' }}>
+                              style={{ borderBottom: '1px solid #F5F3EE' }}>
                               <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                                style={{ background: n.type === 'rejected' ? 'rgba(176,24,24,0.1)' : 'rgba(76,175,114,0.12)' }}>
+                                style={{ background: n.type === 'rejected' ? 'rgba(176,24,24,0.1)' : 'rgba(184,70,15,0.12)' }}>
                                 {n.type === 'rejected'
                                   ? <XCircle size={14} style={{ color: '#B01818' }} />
-                                  : <CheckCircle2 size={14} style={{ color: '#1A5C38' }} />
+                                  : <CheckCircle2 size={14} style={{ color: '#B8460F' }} />
                                 }
                               </div>
                               <div className="min-w-0">
-                                <p className="text-xs font-medium text-ekam-cream">{n.title}</p>
+                                <p className="text-xs font-semibold" style={{ color: '#171310' }}>{n.title}</p>
                                 <p className="text-xs text-ekam-muted mt-0.5 leading-relaxed">{n.message}</p>
                                 <p className="text-[10px] text-ekam-muted mt-1">
                                   {new Date(n.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -172,24 +180,24 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false) }}
-                    className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg transition-all duration-200"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.2)' }}
+                    className="flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg transition-all duration-150"
+                    style={{ border: '1px solid #EAE4D8' }}
                   >
                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
                       style={{ background: 'linear-gradient(135deg, #C4881A, #C44015)' }}>
                       {user.name?.charAt(0) || 'U'}
                     </div>
-                    <ChevronDown size={14} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.7)' }} />
+                    <ChevronDown size={14} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} style={{ color: '#5A5346' }} />
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden shadow-lg z-50 bg-white"
-                      style={{ border: '1px solid #E2D5C4', boxShadow: '0 8px 32px rgba(139,94,10,0.12)' }}>
-                      <div className="px-4 py-3" style={{ borderBottom: '1px solid #EDE4D8' }}>
-                        <p className="text-sm font-medium text-ekam-cream">{user.name}</p>
+                    <div className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden bg-white"
+                      style={{ border: '1px solid #EAE4D8', boxShadow: '0 10px 32px rgba(20,20,20,0.10)' }}>
+                      <div className="px-4 py-3" style={{ borderBottom: '1px solid #F0EBE0' }}>
+                        <p className="text-sm font-bold" style={{ color: '#171310' }}>{user.name}</p>
                         <p className="text-xs text-ekam-muted mt-0.5">{user.email}</p>
                         <span className="badge badge-gold mt-1.5 text-[10px]">
-                          {user.role === 'admin' ? '⚡ Admin' : user.role === 'instructor' ? '🎓 Instructor' : '👤 Student'}
+                          {user.role === 'admin' ? 'Admin' : user.role === 'instructor' ? 'Instructor' : 'Student'}
                         </span>
                       </div>
                       <div className="py-1">
@@ -210,7 +218,7 @@ export default function Header() {
                           <User size={15} /> Profile
                         </Link>
                       </div>
-                      <div className="py-1" style={{ borderTop: '1px solid #EDE4D8' }}>
+                      <div className="py-1" style={{ borderTop: '1px solid #F0EBE0' }}>
                         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-all">
                           <LogOut size={15} /> Sign Out
                         </button>
@@ -221,58 +229,57 @@ export default function Header() {
               </>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/auth/login" className="btn-ghost text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>Sign In</Link>
+                <Link href="/auth/login" className="btn-ghost text-sm">Sign In</Link>
                 <Link href="/auth/signup" className="btn-gold text-sm">Join Ekam</Link>
               </div>
             )}
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200"
-              style={{ color: 'rgba(255,255,255,0.75)' }}
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150"
+              style={{ color: '#5A5346' }}
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
-        {/* Search Bar */}
-        {searchOpen && (
-          <div className="pb-4 animate-scaleIn">
-            <div className="relative search-glow rounded-xl overflow-hidden"
-              style={{ border: '1.5px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)' }}>
-              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.5)' }} />
-              <input
-                type="text"
-                placeholder="Search for courses, instructors, topics..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                autoFocus
-                className="w-full pl-10 pr-12 py-3.5 bg-transparent text-sm text-white placeholder-white/40 outline-none"
-              />
-              <button onClick={() => setSearchOpen(false)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                <X size={16} />
-              </button>
-            </div>
+        {/* Mobile search bar (always visible below header row on small screens) */}
+        <form onSubmit={handleSearch} className="md:hidden pb-3">
+          <div className="relative rounded-full overflow-hidden" style={{ border: '1.5px solid #171310' }}>
+            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-ekam-muted" />
+            <input
+              type="text"
+              placeholder="Search for anything"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-transparent text-sm outline-none"
+              style={{ color: '#171310' }}
+            />
           </div>
-        )}
+        </form>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: '#450013' }}>
+        <div className="md:hidden bg-white" style={{ borderTop: '1px solid #ECE7DD' }}>
           <div className="px-4 py-4 space-y-1">
+            <Link href="/courses" className="flex items-center px-4 py-3 rounded-lg text-sm font-semibold transition-all" style={{ color: '#4A4438' }}>
+              Courses
+            </Link>
             {navLinks.map(link => (
               <Link key={link.href} href={link.href}
-                className="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all"
-                style={{ color: 'rgba(255,255,255,0.7)' }}>
+                className="flex items-center px-4 py-3 rounded-lg text-sm font-semibold transition-all"
+                style={{ color: '#4A4438' }}>
                 {link.label}
               </Link>
             ))}
+            <Link href="/auth/signup?role=instructor" className="flex items-center px-4 py-3 rounded-lg text-sm font-semibold transition-all" style={{ color: '#4A4438' }}>
+              Teach on Ekam
+            </Link>
             {!user && (
-              <div className="pt-3 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: '12px' }}>
-                <Link href="/auth/login" className="btn-outline w-full justify-center"
-                  style={{ color: '#E8C060', borderColor: 'rgba(255,255,255,0.25)' }}>Sign In</Link>
+              <div className="pt-3 flex flex-col gap-2" style={{ borderTop: '1px solid #ECE7DD', marginTop: '12px' }}>
+                <Link href="/auth/login" className="btn-outline w-full justify-center">Sign In</Link>
                 <Link href="/auth/signup" className="btn-gold w-full justify-center">Join Ekam</Link>
               </div>
             )}

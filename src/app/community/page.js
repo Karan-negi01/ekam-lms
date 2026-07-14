@@ -12,7 +12,7 @@ const events = [
 
 export default function CommunityPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Together"
         title="A Community of Learners & Masters"
@@ -32,11 +32,11 @@ export default function CommunityPage() {
               { icon: Users, title: 'WhatsApp Circles', desc: 'Small, tradition-specific groups moderated by instructors — for daily riyaz reminders and quick doubts.' },
               { icon: Calendar, title: 'Live Sessions', desc: 'Monthly live Q&As and practice circles hosted directly by Ekam instructors.' },
             ].map((c, i) => (
-              <div key={i} className="rounded-2xl p-7 text-center" style={{ background: '#FAF5ED', border: '1px solid #EDE4D8' }}>
+              <div key={i} className="rounded-2xl p-7 text-center" style={{ background: '#FFFFFF', border: '1px solid #EDE4D8' }}>
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(140,98,16,0.08)' }}>
                   <c.icon size={22} className="text-ekam-gold" />
                 </div>
-                <h3 className="font-serif text-lg font-semibold mb-2" style={{ color: '#1C0E04' }}>{c.title}</h3>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: '#1C0E04' }}>{c.title}</h3>
                 <p className="text-sm leading-relaxed mb-4" style={{ color: '#7A6550' }}>{c.desc}</p>
                 <Link href="/auth/signup" className="text-xs font-semibold text-ekam-gold hover:text-ekam-gold-light inline-flex items-center gap-1">
                   Join Free <ArrowRight size={12} />
@@ -48,7 +48,7 @@ export default function CommunityPage() {
       </section>
 
       {/* Upcoming events */}
-      <section className="py-24 px-4" style={{ background: '#FAF5ED' }}>
+      <section className="py-24 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
             <span className="section-label mb-4 block justify-center">Calendar</span>
@@ -62,7 +62,7 @@ export default function CommunityPage() {
                   <span className="text-[10px] text-ekam-muted uppercase">{e.date.split(' ')[1]}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-serif font-semibold text-sm" style={{ color: '#1C0E04' }}>{e.title}</p>
+                  <p className="font-semibold text-sm" style={{ color: '#1C0E04' }}>{e.title}</p>
                   <p className="text-xs" style={{ color: '#7A6550' }}>Hosted by {e.host}</p>
                 </div>
                 <span className="badge badge-gold text-[10px] flex-shrink-0">{e.type}</span>

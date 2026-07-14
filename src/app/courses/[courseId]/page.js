@@ -54,7 +54,7 @@ export default function CourseDetailPage() {
 
   if (!courseLoaded) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FFFFFF' }}>
         <div className="loader-gold w-8 h-8" />
       </div>
     )
@@ -62,12 +62,12 @@ export default function CourseDetailPage() {
 
   if (!course) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+      <div className="min-h-screen pt-24 flex items-center justify-center" style={{ background: '#FFFFFF' }}>
         <div className="text-center">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(140,98,16,0.08)' }}>
             <BookOpen size={26} className="text-ekam-gold" />
           </div>
-          <h2 className="font-serif text-2xl text-ekam-cream mb-2">Course not found</h2>
+          <h2 className="text-2xl text-ekam-cream mb-2">Course not found</h2>
           <p className="text-ekam-muted mb-6">This course doesn&apos;t exist or has been removed.</p>
           <Link href="/courses" className="btn-gold">Browse Courses</Link>
         </div>
@@ -183,10 +183,10 @@ export default function CourseDetailPage() {
         <button
           onClick={handleWishlist}
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm transition-all ${
-            wishlist ? 'text-red-400' : 'text-ekam-muted hover:text-ekam-cream'
+            wishlist ? 'text-ekam-rust' : 'text-ekam-muted hover:text-ekam-cream'
           }`}
         >
-          <Heart size={15} className={wishlist ? 'fill-red-400' : ''} />
+          <Heart size={15} className={wishlist ? 'fill-ekam-rust' : ''} />
           {wishlist ? 'Saved to Wishlist' : 'Add to Wishlist'}
         </button>
 
@@ -218,7 +218,7 @@ export default function CourseDetailPage() {
             </a>
           ) : (
             <div className="mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm"
-              style={{ background: '#F5EFE4', color: '#9B8878' }}>
+              style={{ background: '#F7F6F3', color: '#9B8878' }}>
               <Lock size={13} /> Study material unlocks after enrolling
             </div>
           )
@@ -234,9 +234,9 @@ export default function CourseDetailPage() {
   )
 
   return (
-    <div className="min-h-screen pt-16" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-16" style={{ background: '#FFFFFF' }}>
       {/* Hero Banner */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
+      <div className="relative overflow-hidden" style={{ background: '#FFFFFF', borderBottom: '1px solid #E2D5C4' }}>
         <PatternDots />
         <Mandala className="absolute -right-28 -top-24 w-80 h-80 opacity-30 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -252,7 +252,7 @@ export default function CourseDetailPage() {
                 {course.bestseller && <span className="badge badge-saffron text-xs">⚡ Bestseller</span>}
               </div>
 
-              <h1 className="font-serif text-3xl md:text-4xl text-ekam-cream font-semibold leading-tight mb-4">
+              <h1 className="text-3xl md:text-4xl text-ekam-cream font-semibold leading-tight mb-4">
                 {course.title}
               </h1>
 
@@ -289,7 +289,7 @@ export default function CourseDetailPage() {
                 <div>
                   <p className="text-xs text-ekam-muted">Your Instructor</p>
                   <div className="flex items-center gap-2">
-                    <p className="font-serif text-ekam-cream font-medium">{course.instructor?.name}</p>
+                    <p className="text-ekam-cream font-medium">{course.instructor?.name}</p>
                     {course.instructor?.verified && <BadgeCheck size={14} className="text-ekam-gold" />}
                   </div>
                   <p className="text-xs text-ekam-gold">{course.instructor?.title}</p>
@@ -357,7 +357,7 @@ export default function CourseDetailPage() {
             {activeTab === 'curriculum' && (
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-serif text-xl" style={{ color: '#1C0E04' }}>Course Curriculum</h2>
+                  <h2 className="text-xl" style={{ color: '#1C0E04' }}>Course Curriculum</h2>
                   <span className="text-xs text-ekam-muted">{course.curriculum?.length} sections • {totalLessonsCount} lessons • {course.duration}</span>
                 </div>
 
@@ -374,12 +374,12 @@ export default function CourseDetailPage() {
                         <div className="h-full rounded-full transition-all duration-500"
                           style={{
                             width: `${progressPct}%`,
-                            background: progressPct === 100 ? '#1A5C38' : 'linear-gradient(to right, #8C6210, #C4881A)'
+                            background: progressPct === 100 ? '#B8460F' : 'linear-gradient(to right, #8C6210, #C4881A)'
                           }} />
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className="text-2xl font-semibold font-serif" style={{ color: progressPct === 100 ? '#1A5C38' : '#8C6210' }}>
+                      <span className="text-2xl font-semibold" style={{ color: progressPct === 100 ? '#B8460F' : '#8C6210' }}>
                         {progressPct}%
                       </span>
                       <p className="text-[10px] text-ekam-muted">Complete</p>
@@ -428,12 +428,12 @@ export default function CourseDetailPage() {
                                   {/* Icon: completed / playing / locked */}
                                   <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                                     style={{
-                                      background: isCompleted ? 'rgba(26,92,56,0.12)'
+                                      background: isCompleted ? 'rgba(184,70,15,0.12)'
                                         : canAccess ? 'rgba(140,98,16,0.10)'
                                         : '#EDE4D8'
                                     }}>
                                     {isCompleted
-                                      ? <CheckCircle2 size={13} style={{ color: '#1A5C38' }} />
+                                      ? <CheckCircle2 size={13} style={{ color: '#B8460F' }} />
                                       : canAccess
                                         ? <Play size={10} className="ml-0.5" style={{ color: '#8C6210', fill: '#8C6210' }} />
                                         : <Lock size={10} className="text-ekam-muted" />
@@ -442,7 +442,7 @@ export default function CourseDetailPage() {
 
                                   <div className="flex-1 text-left min-w-0">
                                     <p className="text-xs font-medium truncate"
-                                      style={{ color: isActive ? '#8C6210' : isCompleted ? '#1A5C38' : '#3D2814' }}>
+                                      style={{ color: isActive ? '#8C6210' : isCompleted ? '#B8460F' : '#3D2814' }}>
                                       {lesson.title}
                                     </p>
                                     {lesson.free && !enrolled && (
@@ -483,12 +483,12 @@ export default function CourseDetailPage() {
             {activeTab === 'overview' && (
               <div className="space-y-8">
                 <div>
-                  <h2 className="font-serif text-xl text-ekam-cream mb-4">About This Course</h2>
+                  <h2 className="text-xl text-ekam-cream mb-4">About This Course</h2>
                   <p className="text-ekam-muted leading-relaxed">{course.description}</p>
                 </div>
 
                 <div>
-                  <h3 className="font-serif text-lg text-ekam-cream mb-4">What You&apos;ll Learn</h3>
+                  <h3 className="text-lg text-ekam-cream mb-4">What You&apos;ll Learn</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                       'Foundational techniques of the art form',
@@ -507,7 +507,7 @@ export default function CourseDetailPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-serif text-lg text-ekam-cream mb-3">Tags</h3>
+                  <h3 className="text-lg text-ekam-cream mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {course.tags?.map(tag => (
                       <span key={tag} className="badge badge-muted text-xs">{tag}</span>
@@ -520,7 +520,7 @@ export default function CourseDetailPage() {
             {/* Instructor Tab */}
             {activeTab === 'instructor' && (
               <div>
-                <h2 className="font-serif text-xl text-ekam-cream mb-6">About Your Instructor</h2>
+                <h2 className="text-xl text-ekam-cream mb-6">About Your Instructor</h2>
                 <div className="flex items-start gap-5 mb-6">
                   <div className="w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
                     style={{ background: 'linear-gradient(135deg, #D4A843, #E8622A)' }}>
@@ -528,7 +528,7 @@ export default function CourseDetailPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-serif text-xl text-ekam-cream">{course.instructor?.name}</h3>
+                      <h3 className="text-xl text-ekam-cream">{course.instructor?.name}</h3>
                       {course.instructor?.verified && <BadgeCheck size={16} className="text-ekam-gold" />}
                     </div>
                     <p className="text-ekam-gold text-sm mb-3">{course.instructor?.title}</p>
@@ -548,7 +548,7 @@ export default function CourseDetailPage() {
             {/* Reviews Tab */}
             {activeTab === 'reviews' && (
               <div>
-                <h2 className="font-serif text-xl text-ekam-cream mb-6">Student Reviews</h2>
+                <h2 className="text-xl text-ekam-cream mb-6">Student Reviews</h2>
                 <div className="flex items-center gap-8 p-6 rounded-xl mb-6"
                   style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
                   <div className="text-center">

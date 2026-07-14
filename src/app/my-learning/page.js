@@ -20,7 +20,7 @@ function ProgressRing({ pct, size = 56, stroke = 4 }) {
     <svg width={size} height={size} className="rotate-[-90deg]">
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} stroke="#EDE4D8" />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke}
-        stroke={pct === 100 ? '#1A5C38' : '#8C6210'}
+        stroke={pct === 100 ? '#B8460F' : '#8C6210'}
         strokeDasharray={circ} strokeDashoffset={offset}
         strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
     </svg>
@@ -77,20 +77,20 @@ export default function MyLearningPage() {
   const statCards = [
     { label: 'Enrolled', value: enrolledCourses.length, icon: BookOpen, color: '#8C6210', bg: 'rgba(140,98,16,0.08)' },
     { label: 'In Progress', value: totalInProgress, icon: TrendingUp, color: '#C44015', bg: 'rgba(196,64,21,0.08)' },
-    { label: 'Completed', value: totalCompleted, icon: Award, color: '#1A5C38', bg: 'rgba(26,92,56,0.08)' },
+    { label: 'Completed', value: totalCompleted, icon: Award, color: '#B8460F', bg: 'rgba(184,70,15,0.08)' },
     { label: 'Avg Progress', value: `${avgProgress}%`, icon: BarChart3, color: '#B07C18', bg: 'rgba(176,124,24,0.08)' },
   ]
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
 
   return (
-    <div className="min-h-screen pt-20" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-20" style={{ background: '#FFFFFF' }}>
       {/* Hero header */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, #F5EFE4, #FDFAF4)', borderBottom: '1px solid #E2D5C4' }}>
+      <div className="relative overflow-hidden" style={{ background: '#FFFFFF', borderBottom: '1px solid #E2D5C4' }}>
         <PatternDots />
         <Mandala className="absolute -right-24 -top-20 w-72 h-72 opacity-30 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10">
@@ -100,7 +100,7 @@ export default function MyLearningPage() {
                 <div className="w-px h-4 bg-ekam-gold" />
                 <span className="text-xs tracking-widest text-ekam-gold uppercase font-medium">My Learning</span>
               </div>
-              <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-1" style={{ color: '#1C0E04' }}>
+              <h1 className="text-3xl md:text-4xl font-semibold mb-1" style={{ color: '#1C0E04' }}>
                 Welcome back, {user.name?.split(' ')[0]}
               </h1>
               <p className="text-sm" style={{ color: '#7A6550' }}>
@@ -124,7 +124,7 @@ export default function MyLearningPage() {
                   <s.icon size={18} style={{ color: s.color }} />
                 </div>
                 <div>
-                  <p className="text-xl font-semibold font-serif" style={{ color: s.color }}>{s.value}</p>
+                  <p className="text-xl font-semibold" style={{ color: s.color }}>{s.value}</p>
                   <p className="text-xs" style={{ color: '#7A6550' }}>{s.label}</p>
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function MyLearningPage() {
               style={{ background: 'rgba(140,98,16,0.08)' }}>
               <BookOpen size={40} className="text-ekam-gold" />
             </div>
-            <h2 className="font-serif text-2xl mb-3" style={{ color: '#1C0E04' }}>No courses yet</h2>
+            <h2 className="text-2xl mb-3" style={{ color: '#1C0E04' }}>No courses yet</h2>
             <p className="mb-8 max-w-sm mx-auto" style={{ color: '#7A6550' }}>
               Enroll in your first course and start your cultural learning journey today.
             </p>
@@ -162,7 +162,7 @@ export default function MyLearningPage() {
                   style={{ color: '#1C0E04' }} />
               </div>
 
-              <div className="flex gap-1.5 p-1 rounded-xl" style={{ background: '#F5EFE4', border: '1px solid #E2D5C4' }}>
+              <div className="flex gap-1.5 p-1 rounded-xl" style={{ background: '#F7F6F3', border: '1px solid #E2D5C4' }}>
                 {[['all','All'],['not-started','Not Started'],['in-progress','In Progress'],['completed','Done']].map(([val, label]) => (
                   <button key={val} onClick={() => setFilter(val)}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
@@ -180,7 +180,7 @@ export default function MyLearningPage() {
             {/* Course grid */}
             {filtered.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-lg font-serif mb-2" style={{ color: '#1C0E04' }}>No courses match</p>
+                <p className="text-lg mb-2" style={{ color: '#1C0E04' }}>No courses match</p>
                 <p className="text-sm" style={{ color: '#7A6550' }}>Try a different filter or search term</p>
               </div>
             ) : (
@@ -206,7 +206,7 @@ export default function MyLearningPage() {
                           <div className="h-full transition-all duration-500"
                             style={{
                               width: `${p.pct}%`,
-                              background: isDone ? '#1A5C38' : 'linear-gradient(to right, #8C6210, #C4881A)'
+                              background: isDone ? '#B8460F' : 'linear-gradient(to right, #8C6210, #C4881A)'
                             }} />
                         </div>
                         {isDone && (
@@ -225,7 +225,7 @@ export default function MyLearningPage() {
                         </span>
 
                         {/* Title */}
-                        <h3 className="font-serif text-base leading-snug mb-1.5 line-clamp-2" style={{ color: '#1C0E04' }}>
+                        <h3 className="text-base leading-snug mb-1.5 line-clamp-2" style={{ color: '#1C0E04' }}>
                           {course.title}
                         </h3>
 
@@ -240,7 +240,7 @@ export default function MyLearningPage() {
                           <div className="relative flex-shrink-0">
                             <ProgressRing pct={p.pct} />
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-[10px] font-bold" style={{ color: isDone ? '#1A5C38' : '#8C6210' }}>
+                              <span className="text-[10px] font-bold" style={{ color: isDone ? '#B8460F' : '#8C6210' }}>
                                 {p.pct}%
                               </span>
                             </div>
@@ -261,7 +261,7 @@ export default function MyLearningPage() {
                               <div className="h-full rounded-full transition-all duration-500"
                                 style={{
                                   width: `${p.pct}%`,
-                                  background: isDone ? '#1A5C38' : 'linear-gradient(to right, #8C6210, #C4881A)'
+                                  background: isDone ? '#B8460F' : 'linear-gradient(to right, #8C6210, #C4881A)'
                                 }} />
                             </div>
                           </div>
@@ -298,7 +298,7 @@ export default function MyLearningPage() {
                           </Link>
                           {isDone && (
                             <button className="px-3 py-2.5 rounded-xl text-xs font-medium transition-all"
-                              style={{ background: 'rgba(26,92,56,0.08)', border: '1px solid rgba(26,92,56,0.2)', color: '#1A5C38' }}
+                              style={{ background: 'rgba(184,70,15,0.08)', border: '1px solid rgba(184,70,15,0.2)', color: '#B8460F' }}
                               title="Download Certificate">
                               <Award size={16} />
                             </button>

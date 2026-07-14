@@ -39,7 +39,7 @@ export default function CertificatesPage() {
   }
 
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Recognition"
         title="Certificates That Mean Something"
@@ -56,17 +56,17 @@ export default function CertificatesPage() {
               <p className="font-display text-sm tracking-[0.3em] mb-2" style={{ color: '#8C6210' }}>एकम् · EKAM</p>
               <p className="text-xs uppercase tracking-widest mb-6" style={{ color: '#9B8878' }}>Certificate of Completion</p>
               <p className="text-sm mb-2" style={{ color: '#7A6550' }}>This certifies that</p>
-              <p className="font-serif text-3xl mb-2" style={{ color: '#1C0E04' }}>Your Name Here</p>
+              <p className="text-3xl mb-2" style={{ color: '#1C0E04' }}>Your Name Here</p>
               <p className="text-sm mb-6" style={{ color: '#7A6550' }}>has successfully completed</p>
-              <p className="font-serif text-xl italic mb-8" style={{ color: '#8C6210' }}>Hindustani Classical Vocal: From Raga to Performance</p>
+              <p className="text-xl italic mb-8" style={{ color: '#8C6210' }}>Hindustani Classical Vocal: From Raga to Performance</p>
               <div className="flex items-center justify-center gap-16">
                 <div>
-                  <p className="font-serif text-sm border-t pt-2" style={{ color: '#1C0E04', borderColor: '#D4A843', minWidth: '140px' }}>Pandit Ravishankar Mishra</p>
+                  <p className="text-sm border-t pt-2" style={{ color: '#1C0E04', borderColor: '#D4A843', minWidth: '140px' }}>Pandit Ravishankar Mishra</p>
                   <p className="text-[10px] mt-1" style={{ color: '#9B8878' }}>Instructor</p>
                 </div>
                 <Award size={40} className="text-ekam-gold" />
                 <div>
-                  <p className="font-serif text-sm border-t pt-2" style={{ color: '#1C0E04', borderColor: '#D4A843', minWidth: '140px' }}>10 July 2026</p>
+                  <p className="text-sm border-t pt-2" style={{ color: '#1C0E04', borderColor: '#D4A843', minWidth: '140px' }}>10 July 2026</p>
                   <p className="text-[10px] mt-1" style={{ color: '#9B8878' }}>Date Issued</p>
                 </div>
               </div>
@@ -76,7 +76,7 @@ export default function CertificatesPage() {
       </section>
 
       {/* Perks */}
-      <section className="py-20 px-4" style={{ background: '#FAF5ED' }}>
+      <section className="py-20 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <span className="section-label mb-4 block justify-center">Why It Matters</span>
@@ -88,7 +88,7 @@ export default function CertificatesPage() {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(140,98,16,0.08)' }}>
                   <p.icon size={22} className="text-ekam-gold" />
                 </div>
-                <h3 className="font-serif text-lg font-semibold mb-2" style={{ color: '#1C0E04' }}>{p.title}</h3>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: '#1C0E04' }}>{p.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: '#7A6550' }}>{p.desc}</p>
               </div>
             ))}
@@ -99,7 +99,7 @@ export default function CertificatesPage() {
       {/* Your certificates */}
       <section className="py-20 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-3xl mx-auto">
-          <h2 className="section-title text-3xl mb-8 text-center">Your Certificates</h2>
+          <h2 className="section-title text-4xl md:text-5xl mb-8 text-center">Your Certificates</h2>
           {!user ? (
             <div className="card-base p-10 text-center">
               <Award size={32} className="text-ekam-gold mx-auto mb-3" />
@@ -137,10 +137,10 @@ export default function CertificatesPage() {
       </section>
 
       {/* Verify */}
-      <section className="py-20 px-4" style={{ background: '#FAF5ED' }}>
+      <section className="py-20 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-lg mx-auto text-center">
           <span className="section-label mb-4 block justify-center">Verification</span>
-          <h2 className="section-title text-3xl mb-4">Verify a Certificate</h2>
+          <h2 className="section-title text-4xl md:text-5xl mb-4">Verify a Certificate</h2>
           <p className="text-sm mb-6" style={{ color: '#6B5744' }}>Paste a course ID from a certificate to confirm it was genuinely issued by Ekam.</p>
           <form onSubmit={handleVerify} className="flex gap-2">
             <div className="relative flex-1 rounded-xl overflow-hidden bg-white" style={{ border: '1.5px solid #E2D5C4' }}>
@@ -153,9 +153,9 @@ export default function CertificatesPage() {
           {verifyResult && (
             <div className="mt-4 p-4 rounded-xl text-left text-sm"
               style={{
-                background: verifyResult.valid ? 'rgba(76,175,114,0.08)' : 'rgba(176,24,24,0.06)',
-                border: `1px solid ${verifyResult.valid ? 'rgba(76,175,114,0.3)' : 'rgba(176,24,24,0.2)'}`,
-                color: verifyResult.valid ? '#1A5C38' : '#B01818',
+                background: verifyResult.valid ? 'rgba(184,70,15,0.08)' : 'rgba(176,24,24,0.06)',
+                border: `1px solid ${verifyResult.valid ? 'rgba(184,70,15,0.3)' : 'rgba(176,24,24,0.2)'}`,
+                color: verifyResult.valid ? '#B8460F' : '#B01818',
               }}>
               {verifyResult.valid
                 ? <>✓ Valid certificate for <strong>{verifyResult.course.title}</strong></>

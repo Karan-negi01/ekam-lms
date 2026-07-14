@@ -17,7 +17,7 @@ const openings = [
 
 export default function CareersPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Careers"
         title="Help Us Keep a Tradition Alive"
@@ -33,11 +33,11 @@ export default function CareersPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {perks.map((p, i) => (
-              <div key={i} className="rounded-2xl p-6 text-center" style={{ background: '#FAF5ED', border: '1px solid #EDE4D8' }}>
+              <div key={i} className="rounded-2xl p-6 text-center" style={{ background: '#FFFFFF', border: '1px solid #EDE4D8' }}>
                 <div className="w-11 h-11 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(140,98,16,0.08)' }}>
                   <p.icon size={20} className="text-ekam-gold" />
                 </div>
-                <h3 className="font-serif text-base font-semibold mb-1.5" style={{ color: '#1C0E04' }}>{p.title}</h3>
+                <h3 className="text-base font-semibold mb-1.5" style={{ color: '#1C0E04' }}>{p.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: '#7A6550' }}>{p.desc}</p>
               </div>
             ))}
@@ -46,7 +46,7 @@ export default function CareersPage() {
       </section>
 
       {/* Open roles */}
-      <section className="py-24 px-4" style={{ background: '#FAF5ED' }}>
+      <section className="py-24 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <span className="section-label mb-4 block justify-center">Join Us</span>
@@ -58,7 +58,7 @@ export default function CareersPage() {
                 className="group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 p-6 rounded-2xl bg-white transition-all duration-300 hover:-translate-y-0.5"
                 style={{ border: '1px solid #EDE4D8' }}>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-serif text-base font-semibold mb-1" style={{ color: '#1C0E04' }}>{role.title}</h3>
+                  <h3 className="text-base font-semibold mb-1" style={{ color: '#1C0E04' }}>{role.title}</h3>
                   <div className="flex flex-wrap items-center gap-3 text-xs" style={{ color: '#7A6550' }}>
                     <span className="badge badge-gold text-[10px]">{role.dept}</span>
                     <span className="flex items-center gap-1"><MapPin size={11} /> {role.location}</span>

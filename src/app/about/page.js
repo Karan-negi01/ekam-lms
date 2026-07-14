@@ -20,7 +20,7 @@ const timeline = [
 
 export default function AboutPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero
         label="Our Story"
         title="Preserving India's Living Traditions"
@@ -31,7 +31,7 @@ export default function AboutPage() {
       <section className="py-24 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-3xl mx-auto text-center">
           <span className="section-label mb-4 block justify-center">Our Mission</span>
-          <h2 className="section-title text-3xl md:text-4xl mb-6">
+          <h2 className="section-title text-4xl md:text-5xl mb-6">
             Every classical art form deserves a next generation of students.
           </h2>
           <p className="text-base leading-relaxed" style={{ color: '#6B5744', lineHeight: '1.8' }}>
@@ -45,7 +45,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-24 px-4" style={{ background: '#FAF5ED' }}>
+      <section className="py-24 px-4" style={{ background: '#FFFFFF' }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <span className="section-label mb-4 block justify-center">What We Stand For</span>
@@ -58,7 +58,7 @@ export default function AboutPage() {
                   <v.icon size={22} className="text-ekam-gold" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-lg font-semibold mb-1.5" style={{ color: '#1C0E04' }}>{v.title}</h3>
+                  <h3 className="text-lg font-semibold mb-1.5" style={{ color: '#1C0E04' }}>{v.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#7A6550' }}>{v.desc}</p>
                 </div>
               </div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
                 {i < timeline.length - 1 && (
                   <div className="absolute left-[27px] top-10 bottom-0 w-px" style={{ background: '#EDE4D8' }} />
                 )}
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 font-serif text-sm font-bold z-10"
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-sm font-bold z-10"
                   style={{ background: 'rgba(140,98,16,0.08)', color: '#8C6210' }}>
                   {t.year}
                 </div>
@@ -100,7 +100,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
             {[['85,000+', 'Students'], ['320+', 'Verified Masters'], ['1,200+', 'Courses'], ['8', 'Traditions']].map(([v, l], i) => (
               <div key={i}>
-                <p className="text-3xl font-bold font-serif text-white mb-1">{v}</p>
+                <p className="text-3xl font-bold text-white mb-1">{v}</p>
                 <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{l}</p>
               </div>
             ))}

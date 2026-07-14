@@ -22,7 +22,7 @@ export default function AuthSidePanel() {
 
       <div className="relative z-10">
         <p className="font-display text-lg tracking-[0.15em] mb-4" style={{ color: '#D4A843' }}>सा विद्या या विमुक्तये</p>
-        <h2 className="font-serif text-3xl font-semibold text-white leading-snug mb-4">
+        <h2 className="text-3xl font-semibold text-white leading-snug mb-4">
           That which liberates,<br />is true knowledge.
         </h2>
         <p className="text-sm leading-relaxed max-w-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
@@ -33,7 +33,7 @@ export default function AuthSidePanel() {
       <div className="relative z-10 grid grid-cols-3 gap-4">
         {[['85,000+', 'Students'], ['320+', 'Instructors'], ['1,200+', 'Courses']].map(([v, l], i) => (
           <div key={i}>
-            <p className="text-xl font-bold font-serif" style={{ color: '#D4A843' }}>{v}</p>
+            <p className="text-xl font-bold" style={{ color: '#D4A843' }}>{v}</p>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{l}</p>
           </div>
         ))}

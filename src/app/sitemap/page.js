@@ -54,14 +54,14 @@ const groups = [
 
 export default function SitemapPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero label="Navigation" title="Sitemap" subtitle="Every page on Ekam, in one place." />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
           {groups.map((g, i) => (
             <div key={i}>
-              <h2 className="font-serif text-lg font-semibold mb-4 pb-2" style={{ color: '#1C0E04', borderBottom: '1px solid #EDE4D8' }}>{g.title}</h2>
+              <h2 className="text-lg font-semibold mb-4 pb-2" style={{ color: '#1C0E04', borderBottom: '1px solid #EDE4D8' }}>{g.title}</h2>
               <ul className="space-y-2">
                 {g.links.map((link, j) => (
                   <li key={j}>

@@ -33,11 +33,11 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div style={{ background: '#FDFAF4' }}>
+    <div style={{ background: '#FFFFFF' }}>
       <PageHero label="Legal" title="Privacy Policy" subtitle="Last updated: 1 July 2026" />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-        <div className="rounded-2xl p-6 mb-10 text-sm leading-relaxed" style={{ background: '#FAF5ED', border: '1px solid #EDE4D8', color: '#7A6550' }}>
+        <div className="rounded-2xl p-6 mb-10 text-sm leading-relaxed" style={{ background: '#FFFFFF', border: '1px solid #EDE4D8', color: '#7A6550' }}>
           Ekam Learning Pvt. Ltd. (&ldquo;Ekam&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) respects your privacy. This
           policy explains what we collect, how we use it, and the choices you have.
         </div>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         <div className="space-y-8">
           {sections.map((s, i) => (
             <div key={i}>
-              <h2 className="font-serif text-xl font-semibold mb-2" style={{ color: '#1C0E04' }}>{s.title}</h2>
+              <h2 className="text-xl font-semibold mb-2" style={{ color: '#1C0E04' }}>{s.title}</h2>
               <p className="text-sm leading-relaxed" style={{ color: '#6B5744' }}>{s.body}</p>
             </div>
           ))}

@@ -55,7 +55,7 @@ export default function ProfilePage() {
   }
 
   if (!user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
       <div className="loader-gold w-8 h-8" />
     </div>
   )
@@ -63,11 +63,11 @@ export default function ProfilePage() {
   const meta = roleMeta[user.role] || roleMeta.student
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4" style={{ background: '#FDFAF4' }}>
+    <div className="min-h-screen pt-24 pb-20 px-4" style={{ background: '#FFFFFF' }}>
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <span className="section-label mb-3 block">Account</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold" style={{ color: '#1C0E04' }}>Your Profile</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold" style={{ color: '#1C0E04' }}>Your Profile</h1>
         </div>
 
         {/* Profile card */}
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             {user.name?.charAt(0) || 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-serif text-xl font-semibold" style={{ color: '#1C0E04' }}>{user.name}</p>
+            <p className="text-xl font-semibold" style={{ color: '#1C0E04' }}>{user.name}</p>
             <p className="text-sm mb-2" style={{ color: '#7A6550' }}>{user.email}</p>
             <span className="inline-flex items-center gap-1.5 badge text-[10px] font-semibold"
               style={{ background: `${meta.color}15`, border: `1px solid ${meta.color}40`, color: meta.color }}>
@@ -103,7 +103,7 @@ export default function ProfilePage() {
 
         {/* Edit form */}
         <div className="card-base p-7 mb-6">
-          <h2 className="font-serif text-lg font-semibold mb-5" style={{ color: '#1C0E04' }}>Edit Details</h2>
+          <h2 className="text-lg font-semibold mb-5" style={{ color: '#1C0E04' }}>Edit Details</h2>
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Full Name</label>
