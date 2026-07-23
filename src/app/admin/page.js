@@ -578,7 +578,7 @@ function LessonPreviewLink({ lesson }) {
       </a>
     ) : (
       <span className="text-xs text-ekam-muted flex items-center gap-1.5">
-        <Play size={11} /> {lesson.title || 'Untitled lesson'} (uploaded file — only viewable on the instructor's browser)
+        <Play size={11} /> {lesson.title || 'Untitled lesson'} (uploaded file — only viewable on the instructor&apos;s browser)
       </span>
     )
   }
