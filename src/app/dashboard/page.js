@@ -6,18 +6,28 @@ import Link from 'next/link'
 import {
   Plus, BookOpen, Users, Star, BarChart3, Video, Edit3, Trash2,
   Eye, Clock, CheckCircle2, AlertCircle, Upload, X, DollarSign,
-  TrendingUp, Play, GraduationCap, FileText, Percent
+  TrendingUp, Play, GraduationCap, FileText, Percent, ChevronDown, Lock
 } from 'lucide-react'
 import { courses as allCourses, categories } from '@/lib/data'
 import { formatPrice, formatNumber } from '@/lib/utils'
+import { saveFile } from '@/lib/fileStore'
 import CategoryIcon from '@/components/icons/CategoryIcon'
 
-const EMPTY_LESSON = { title: '', videoUrl: '', duration: '', free: false, materialUrl: '' }
+const CATEGORY_OPTIONS = [...categories, { id: 'other', label: 'Other' }]
+
+const EMPTY_LESSON = {
+  title: '', duration: '',
+  videoSource: 'url', videoUrl: '', videoFileId: '', videoFileName: '',
+  materialSource: 'url', materialUrl: '', materialFileId: '', materialFileName: '',
+  test: [],
+}
 
 const EMPTY_COURSE = {
   title: '',
   description: '',
   category: 'music',
+  customCategory: '',
+  pricingModel: 'paid',
   price: '',
   level: 'Beginner',
   language: 'Hindi & English',
@@ -67,13 +77,16 @@ export default function DashboardPage() {
     setSaving(true)
     await new Promise(r => setTimeout(r, 800))
 
+    const price = courseForm.pricingModel === 'subscription' ? 0 : (Number(courseForm.price) || 0)
     const newCourse = {
       id: editingCourse?.id || 'my-course-' + Date.now(),
       ...courseForm,
-      price: Number(courseForm.price) || 0,
-      originalPrice: Number(courseForm.price) || 0,
+      price,
+      originalPrice: price,
       category: courseForm.category,
-      categoryLabel: categories.find(c => c.id === courseForm.category)?.label || '',
+      categoryLabel: courseForm.category === 'other'
+        ? (courseForm.customCategory || 'Other')
+        : (categories.find(c => c.id === courseForm.category)?.label || ''),
       instructor: { name: user.name, initials: user.name?.slice(0, 2).toUpperCase(), verified: false, id: user.id },
       rating: 0,
       reviewCount: 0,
@@ -115,11 +128,14 @@ export default function DashboardPage() {
   }
 
   const editCourse = (course) => {
+    if (course.status === 'published') return
     setEditingCourse(course)
     setCourseForm({
       title: course.title,
       description: course.description,
       category: course.category,
+      customCategory: course.customCategory || '',
+      pricingModel: course.pricingModel || 'paid',
       price: course.price,
       level: course.level,
       language: course.language,
@@ -494,10 +510,15 @@ export default function DashboardPage() {
                       <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Category</label>
                       <select value={courseForm.category} onChange={e => handleFormChange('category', e.target.value)}
                         className="input-field">
-                        {categories.map(cat => (
+                        {CATEGORY_OPTIONS.map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.label}</option>
                         ))}
                       </select>
+                      {courseForm.category === 'other' && (
+                        <input type="text" value={courseForm.customCategory}
+                          onChange={e => handleFormChange('customCategory', e.target.value)}
+                          placeholder="Please specify" className="input-field mt-2 text-sm" />
+                      )}
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Level</label>
@@ -517,10 +538,28 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
+                    <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Pricing Model</label>
+                    <div className="flex gap-2">
+                      {[['paid', 'One-time Purchase'], ['subscription', 'Included in Subscription']].map(([value, label]) => (
+                        <button key={value} type="button" onClick={() => handleFormChange('pricingModel', value)}
+                          className="flex-1 px-3 py-2.5 rounded-lg text-xs font-medium transition-all"
+                          style={{
+                            background: courseForm.pricingModel === value ? '#8C6210' : 'white',
+                            border: '1.5px solid ' + (courseForm.pricingModel === value ? '#8C6210' : '#E2D5C4'),
+                            color: courseForm.pricingModel === value ? '#FFFFFF' : '#7A6550',
+                          }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-ekam-muted mt-1">Subscription courses don&apos;t have an individual price — any student with an active Ekam subscription gets free access.</p>
+                  </div>
+
+                  <div>
                     <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Intro Video URL (YouTube)</label>
                     <input type="url" value={courseForm.videoUrl} onChange={e => handleFormChange('videoUrl', e.target.value)}
                       placeholder="https://youtube.com/watch?v=..." className="input-field" />
-                    <p className="text-xs text-ekam-muted mt-1">Paste a YouTube URL for the course preview video</p>
+                    <p className="text-xs text-ekam-muted mt-1">This preview video is shown publicly to every visitor, logged in or not — it&apos;s the only video anyone can watch without buying or subscribing.</p>
                   </div>
                 </div>
               )}
@@ -591,53 +630,92 @@ export default function DashboardPage() {
                       <div className="p-3 space-y-2">
                         {section.lessons.map((lesson, lIdx) => (
                           <div key={lIdx} className="p-3 rounded-lg space-y-2" style={{ background: '#FFFFFF' }}>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="flex gap-2">
                               <input
                                 type="text"
                                 value={lesson.title}
                                 onChange={e => updateLesson(sIdx, lIdx, 'title', e.target.value)}
                                 placeholder="Lesson title"
-                                className="input-field text-xs py-2"
+                                className="input-field text-xs py-2 flex-1"
                               />
-                              <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={lesson.duration}
+                                onChange={e => updateLesson(sIdx, lIdx, 'duration', e.target.value)}
+                                placeholder="MM:SS"
+                                className="input-field text-xs py-2 w-16"
+                              />
+                              {section.lessons.length > 1 && (
+                                <button onClick={() => removeLesson(sIdx, lIdx)} className="text-ekam-muted hover:text-red-400">
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Lesson video: upload or paste URL */}
+                            <div>
+                              <SourceToggle
+                                value={lesson.videoSource}
+                                onChange={v => updateLesson(sIdx, lIdx, 'videoSource', v)}
+                              />
+                              {lesson.videoSource === 'upload' ? (
+                                <FileUploadField
+                                  accept="video/*"
+                                  fileName={lesson.videoFileName}
+                                  placeholder="Upload lesson video"
+                                  onUploaded={(fileId, name) => {
+                                    updateLesson(sIdx, lIdx, 'videoFileId', fileId)
+                                    updateLesson(sIdx, lIdx, 'videoFileName', name)
+                                  }}
+                                />
+                              ) : (
                                 <input
                                   type="url"
                                   value={lesson.videoUrl}
                                   onChange={e => updateLesson(sIdx, lIdx, 'videoUrl', e.target.value)}
                                   placeholder="YouTube URL"
-                                  className="input-field text-xs py-2 flex-1"
+                                  className="input-field text-xs py-2 w-full"
                                 />
-                                <input
-                                  type="text"
-                                  value={lesson.duration}
-                                  onChange={e => updateLesson(sIdx, lIdx, 'duration', e.target.value)}
-                                  placeholder="MM:SS"
-                                  className="input-field text-xs py-2 w-16"
+                              )}
+                            </div>
+
+                            {courseForm.studyMaterialType === 'per-lesson' && (
+                              <div>
+                                <SourceToggle
+                                  value={lesson.materialSource}
+                                  onChange={v => updateLesson(sIdx, lIdx, 'materialSource', v)}
+                                  labels={['Paste Link', 'Upload PDF']}
                                 />
-                                <div className="flex items-center gap-1">
-                                  <input type="checkbox" checked={lesson.free} onChange={e => updateLesson(sIdx, lIdx, 'free', e.target.checked)}
-                                    id={`free-${sIdx}-${lIdx}`} className="accent-ekam-gold" />
-                                  <label htmlFor={`free-${sIdx}-${lIdx}`} className="text-xs text-ekam-muted">Free</label>
-                                </div>
-                                {section.lessons.length > 1 && (
-                                  <button onClick={() => removeLesson(sIdx, lIdx)} className="text-ekam-muted hover:text-red-400">
-                                    <X size={14} />
-                                  </button>
+                                {lesson.materialSource === 'upload' ? (
+                                  <FileUploadField
+                                    accept="application/pdf"
+                                    fileName={lesson.materialFileName}
+                                    placeholder="Upload lesson PDF"
+                                    onUploaded={(fileId, name) => {
+                                      updateLesson(sIdx, lIdx, 'materialFileId', fileId)
+                                      updateLesson(sIdx, lIdx, 'materialFileName', name)
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <FileText size={13} className="text-ekam-gold flex-shrink-0" />
+                                    <input
+                                      type="url"
+                                      value={lesson.materialUrl}
+                                      onChange={e => updateLesson(sIdx, lIdx, 'materialUrl', e.target.value)}
+                                      placeholder="PDF link for this lesson"
+                                      className="input-field text-xs py-2 flex-1"
+                                    />
+                                  </div>
                                 )}
                               </div>
-                            </div>
-                            {courseForm.studyMaterialType === 'per-lesson' && (
-                              <div className="flex items-center gap-2">
-                                <FileText size={13} className="text-ekam-gold flex-shrink-0" />
-                                <input
-                                  type="url"
-                                  value={lesson.materialUrl}
-                                  onChange={e => updateLesson(sIdx, lIdx, 'materialUrl', e.target.value)}
-                                  placeholder="PDF link for this lesson"
-                                  className="input-field text-xs py-2 flex-1"
-                                />
-                              </div>
                             )}
+
+                            <LessonTestEditor
+                              lIdx={lIdx}
+                              test={lesson.test || []}
+                              onChange={next => updateLesson(sIdx, lIdx, 'test', next)}
+                            />
                           </div>
                         ))}
                         <button onClick={() => addLesson(sIdx)} className="text-xs text-ekam-gold hover:text-ekam-gold-light flex items-center gap-1 px-3 py-1.5 transition-colors">
@@ -652,18 +730,25 @@ export default function DashboardPage() {
               {/* Step 3: Pricing */}
               {formStep === 3 && (
                 <div className="space-y-5">
-                  <div>
-                    <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Course Price (₹)</label>
-                    <input
-                      type="number"
-                      value={courseForm.price}
-                      onChange={e => handleFormChange('price', e.target.value)}
-                      placeholder="e.g. 1999 (leave 0 for free)"
-                      className="input-field text-lg"
-                      min="0"
-                    />
-                    <p className="text-xs text-ekam-muted mt-1">Enter 0 for a free course. For paid courses, Ekam&apos;s team sets a commission rate during review — you&apos;ll see the exact rate once your course is approved.</p>
-                  </div>
+                  {courseForm.pricingModel === 'paid' ? (
+                    <div>
+                      <label className="block text-xs font-medium text-ekam-cream-dim mb-1.5">Course Price (₹)</label>
+                      <input
+                        type="number"
+                        value={courseForm.price}
+                        onChange={e => handleFormChange('price', e.target.value)}
+                        placeholder="e.g. 1999 (leave 0 for free)"
+                        className="input-field text-lg"
+                        min="0"
+                      />
+                      <p className="text-xs text-ekam-muted mt-1">Ekam&apos;s team sets a commission rate during review — you&apos;ll see the exact rate once your course is approved.</p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl p-4 text-xs" style={{ background: 'rgba(140,98,16,0.06)', border: '1px solid rgba(140,98,16,0.18)' }}>
+                      <p className="text-ekam-gold font-medium mb-1">Included in Subscription</p>
+                      <p className="text-ekam-muted">This course has no individual price — any student with an active Ekam subscription gets free access to it.</p>
+                    </div>
+                  )}
 
                   {/* Preview */}
                   <div className="rounded-xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E2D5C4' }}>
@@ -686,7 +771,9 @@ export default function DashboardPage() {
                           <span>{courseForm.level}</span>
                         </div>
                         <p className="text-base font-semibold text-ekam-gold mt-2">
-                          {courseForm.price > 0 ? `₹${Number(courseForm.price).toLocaleString('en-IN')}` : 'Free'}
+                          {courseForm.pricingModel === 'subscription'
+                            ? 'Included in Subscription'
+                            : (courseForm.price > 0 ? `₹${Number(courseForm.price).toLocaleString('en-IN')}` : 'Free')}
                         </p>
                       </div>
                     </div>
@@ -695,6 +782,11 @@ export default function DashboardPage() {
                       style={{ background: 'rgba(212,168,67,0.06)', border: '1px solid rgba(212,168,67,0.15)' }}>
                       <p className="text-ekam-gold font-medium mb-1">📋 Submission Note</p>
                       <p className="text-ekam-muted">Your course will be submitted for review by the Ekam team. It will be published within 48 hours after approval. You&apos;ll receive a notification once it&apos;s live.</p>
+                    </div>
+
+                    <div className="mt-3 p-3 rounded-lg text-xs" style={{ background: 'rgba(176,24,24,0.06)', border: '1px solid rgba(176,24,24,0.2)' }}>
+                      <p className="font-medium mb-1" style={{ color: '#B01818' }}>⚠️ Before you submit</p>
+                      <p className="text-ekam-muted">Once approved by Ekam, this course cannot be edited. Please review the title, description, videos, tests, and pricing carefully before submitting.</p>
                     </div>
                   </div>
                 </div>
@@ -790,17 +882,130 @@ function CourseRow({ course, onEdit, onDelete }) {
           title="Preview">
           <Eye size={14} />
         </Link>
-        <button onClick={() => onEdit(course)}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-ekam-muted hover:text-ekam-gold hover:bg-ekam-gold/10 transition-all"
-          title="Edit">
-          <Edit3 size={14} />
-        </button>
+        {course.status === 'published' ? (
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-ekam-muted"
+            title="Approved courses can't be edited">
+            <Lock size={13} />
+          </div>
+        ) : (
+          <button onClick={() => onEdit(course)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ekam-muted hover:text-ekam-gold hover:bg-ekam-gold/10 transition-all"
+            title="Edit">
+            <Edit3 size={14} />
+          </button>
+        )}
         <button onClick={() => onDelete(course.id)}
           className="w-8 h-8 rounded-lg flex items-center justify-center text-ekam-muted hover:text-red-400 hover:bg-red-900/20 transition-all"
           title="Delete">
           <Trash2 size={14} />
         </button>
       </div>
+    </div>
+  )
+}
+
+function SourceToggle({ value, onChange, labels = ['Paste URL', 'Upload'] }) {
+  return (
+    <div className="flex gap-1 mb-1.5">
+      {[['url', labels[0]], ['upload', labels[1]]].map(([v, label]) => (
+        <button key={v} type="button" onClick={() => onChange(v)}
+          className="text-[10px] px-2 py-1 rounded font-medium transition-all"
+          style={{
+            background: value === v ? '#8C6210' : '#F0EBE0',
+            color: value === v ? '#FFFFFF' : '#7A6550',
+          }}>
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function FileUploadField({ accept, fileName, placeholder, onUploaded }) {
+  const [uploading, setUploading] = useState(false)
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const fileId = await saveFile(file)
+    onUploaded(fileId, file.name)
+    setUploading(false)
+  }
+
+  return (
+    <label className="input-field text-xs py-2 flex items-center gap-2 cursor-pointer" style={{ color: fileName ? '#1C0E04' : '#B5A898' }}>
+      <Upload size={13} className="text-ekam-gold flex-shrink-0" />
+      <span className="truncate">{uploading ? 'Uploading...' : (fileName || placeholder)}</span>
+      <input type="file" accept={accept} className="hidden" onChange={handleFile} />
+    </label>
+  )
+}
+
+function LessonTestEditor({ lIdx, test, onChange }) {
+  const [open, setOpen] = useState(false)
+
+  const addQuestion = () => {
+    onChange([...test, {
+      id: 'q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      question: '', options: ['', '', '', ''], correctIndex: 0,
+    }])
+    setOpen(true)
+  }
+
+  const updateQuestion = (qIdx, field, value) => {
+    const next = [...test]
+    next[qIdx] = { ...next[qIdx], [field]: value }
+    onChange(next)
+  }
+
+  const updateOption = (qIdx, oIdx, value) => {
+    const next = [...test]
+    const options = [...next[qIdx].options]
+    options[oIdx] = value
+    next[qIdx] = { ...next[qIdx], options }
+    onChange(next)
+  }
+
+  const removeQuestion = (qIdx) => onChange(test.filter((_, i) => i !== qIdx))
+
+  return (
+    <div className="rounded-lg p-2" style={{ background: '#FAFAF4', border: '1px solid #EDE4D8' }}>
+      <button type="button" onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between text-xs font-medium text-ekam-gold">
+        <span>Video {lIdx + 1} Test ({test.length} question{test.length === 1 ? '' : 's'})</span>
+        <ChevronDown size={13} className="transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+      </button>
+      {open && (
+        <div className="mt-2 space-y-2">
+          {test.map((q, qIdx) => (
+            <div key={q.id} className="p-2 rounded-lg space-y-1.5" style={{ background: '#FFFFFF', border: '1px solid #EDE4D8' }}>
+              <div className="flex gap-1.5">
+                <input type="text" value={q.question} onChange={e => updateQuestion(qIdx, 'question', e.target.value)}
+                  placeholder={`Question ${qIdx + 1}`} className="input-field text-xs py-1.5 flex-1" />
+                <button type="button" onClick={() => removeQuestion(qIdx)} className="text-ekam-muted hover:text-red-400 flex-shrink-0">
+                  <X size={13} />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {q.options.map((opt, oIdx) => (
+                  <div key={oIdx} className="flex items-center gap-1">
+                    <input type="radio" name={`correct-${q.id}`} checked={q.correctIndex === oIdx}
+                      onChange={() => updateQuestion(qIdx, 'correctIndex', oIdx)} className="accent-ekam-gold flex-shrink-0" />
+                    <input type="text" value={opt} onChange={e => updateOption(qIdx, oIdx, e.target.value)}
+                      placeholder={`Option ${oIdx + 1}`} className="input-field text-xs py-1.5 flex-1" />
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-ekam-muted">Select the radio button next to the correct answer.</p>
+            </div>
+          ))}
+          <button type="button" onClick={addQuestion}
+            className="text-xs text-ekam-gold hover:text-ekam-gold-light flex items-center gap-1 px-2 py-1 transition-colors">
+            <Plus size={12} /> Add Question
+          </button>
+        </div>
+      )}
     </div>
   )
 }

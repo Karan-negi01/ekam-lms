@@ -7,8 +7,8 @@ import {
   BookOpen, Clock, CheckCircle2, Play, BarChart3, Award,
   TrendingUp, Star, ChevronRight, Search, Filter
 } from 'lucide-react'
-import { courses } from '@/lib/data'
-import { formatNumber } from '@/lib/utils'
+import { courses as staticCourses } from '@/lib/data'
+import { formatNumber, getPublishedUserCourses, getLessonProgress } from '@/lib/utils'
 import CategoryIcon from '@/components/icons/CategoryIcon'
 import { Mandala, PatternDots } from '@/components/decor/Decorative'
 
@@ -42,15 +42,16 @@ export default function MyLearningPage() {
     setUser(u)
 
     // Load enrolled course IDs
+    const allCourses = [...staticCourses, ...getPublishedUserCourses()]
     const enrolledIds = JSON.parse(localStorage.getItem('ekam_enrolled') || '[]')
-    const enrolled = courses.filter(c => enrolledIds.includes(c.id))
+    const enrolled = allCourses.filter(c => enrolledIds.includes(c.id))
     setEnrolledCourses(enrolled)
 
     // Load progress for each course
     const pMap = {}
     enrolledIds.forEach(id => {
-      const completed = JSON.parse(localStorage.getItem(`ekam_progress_${id}`) || '[]')
-      const course = courses.find(c => c.id === id)
+      const completed = getLessonProgress(u.id, id)
+      const course = allCourses.find(c => c.id === id)
       const total = course?.curriculum?.reduce((a, s) => a + s.lessons.length, 0) || 0
       pMap[id] = { completed: completed.length, total, pct: total > 0 ? Math.round((completed.length / total) * 100) : 0 }
     })

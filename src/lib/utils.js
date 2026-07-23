@@ -119,3 +119,76 @@ export function saveUserToDirectory(user) {
     localStorage.setItem('ekam_users', JSON.stringify(dir))
   } catch {}
 }
+
+export function getAllUsers() {
+  if (typeof window === 'undefined') return []
+  try {
+    const dir = JSON.parse(localStorage.getItem('ekam_users') || '{}')
+    return Object.values(dir)
+  } catch {
+    return []
+  }
+}
+
+// Per-course purchases and platform-wide subscription, namespaced by user id
+// so demo accounts sharing one browser don't bleed into each other's access.
+export function hasPurchased(userId, courseId) {
+  if (typeof window === 'undefined' || !userId) return false
+  try {
+    const list = JSON.parse(localStorage.getItem(`ekam_purchases_${userId}`) || '[]')
+    return list.some(p => p.courseId === courseId)
+  } catch {
+    return false
+  }
+}
+
+export function purchaseCourse(userId, courseId) {
+  if (typeof window === 'undefined' || !userId) return
+  const list = JSON.parse(localStorage.getItem(`ekam_purchases_${userId}`) || '[]')
+  if (!list.some(p => p.courseId === courseId)) {
+    list.push({ courseId, purchasedAt: new Date().toISOString() })
+    localStorage.setItem(`ekam_purchases_${userId}`, JSON.stringify(list))
+  }
+}
+
+export function getSubscription(userId) {
+  if (typeof window === 'undefined' || !userId) return { active: false }
+  try {
+    return JSON.parse(localStorage.getItem(`ekam_subscription_${userId}`) || '{"active":false}')
+  } catch {
+    return { active: false }
+  }
+}
+
+export function subscribe(userId) {
+  if (typeof window === 'undefined' || !userId) return
+  localStorage.setItem(`ekam_subscription_${userId}`, JSON.stringify({ active: true, startedAt: new Date().toISOString() }))
+}
+
+export function hasCourseAccess(userId, course) {
+  if (!userId || !course) return false
+  if (course.pricingModel === 'subscription') return getSubscription(userId).active
+  return hasPurchased(userId, course.id)
+}
+
+// Per-user, per-course lesson progress. A lesson is appended only once its
+// test is passed 100% — this replaces the old global (non-namespaced)
+// ekam_progress_${courseId} key so demo accounts don't share progress.
+export function getLessonProgress(userId, courseId) {
+  if (typeof window === 'undefined' || !userId || !courseId) return []
+  try {
+    return JSON.parse(localStorage.getItem(`ekam_progress_${userId}_${courseId}`) || '[]')
+  } catch {
+    return []
+  }
+}
+
+export function markLessonComplete(userId, courseId, lessonId) {
+  if (typeof window === 'undefined' || !userId || !courseId) return
+  const list = getLessonProgress(userId, courseId)
+  if (!list.some(p => p.lessonId === lessonId)) {
+    list.push({ lessonId, completedAt: new Date().toISOString() })
+    localStorage.setItem(`ekam_progress_${userId}_${courseId}`, JSON.stringify(list))
+  }
+  return list
+}

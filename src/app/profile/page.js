@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { User, Mail, BookOpen, Heart, Award, LogOut, Save, ShieldCheck, GraduationCap } from 'lucide-react'
-import { courses } from '@/lib/data'
+import { User, Mail, BookOpen, Heart, Award, LogOut, Save, ShieldCheck, GraduationCap, Zap, Medal } from 'lucide-react'
+import { courses as staticCourses } from '@/lib/data'
+import { getPublishedUserCourses, getLessonProgress } from '@/lib/utils'
+import { getXP, getBadges, getLevelProgress } from '@/lib/gamification'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -14,6 +16,8 @@ export default function ProfilePage() {
   const [enrolledCount, setEnrolledCount] = useState(0)
   const [wishlistCount, setWishlistCount] = useState(0)
   const [certCount, setCertCount] = useState(0)
+  const [levelProgress, setLevelProgress] = useState({ level: 0, xp: 0, currentThreshold: 0, nextThreshold: 100, pct: 0 })
+  const [badges, setBadges] = useState([])
 
   useEffect(() => {
     const stored = localStorage.getItem('ekam_user')
@@ -26,13 +30,18 @@ export default function ProfilePage() {
     setEnrolledCount(enrolled.length)
     setWishlistCount(JSON.parse(localStorage.getItem('ekam_wishlist') || '[]').length)
 
+    const allCourses = [...staticCourses, ...getPublishedUserCourses()]
     const done = enrolled.filter(id => {
-      const course = courses.find(c => c.id === id)
+      const course = allCourses.find(c => c.id === id)
       if (!course) return false
-      const progress = JSON.parse(localStorage.getItem(`ekam_progress_${id}`) || '[]')
-      return progress.length >= (course.totalLessons || Infinity)
+      const totalLessons = course.curriculum?.reduce((a, s) => a + s.lessons.length, 0) || course.totalLessons || Infinity
+      const progress = getLessonProgress(u.id, id)
+      return progress.length >= totalLessons
     })
     setCertCount(done.length)
+
+    setLevelProgress(getLevelProgress(getXP(u.id)))
+    setBadges(getBadges(u.id))
   }, [router])
 
   const handleSave = () => {
@@ -99,6 +108,47 @@ export default function ProfilePage() {
               <p className="text-xs text-ekam-muted">{label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Level / XP progress */}
+        <div className="card-base p-7 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Zap size={17} className="text-ekam-gold" />
+              <h2 className="text-lg font-semibold" style={{ color: '#1C0E04' }}>Level {levelProgress.level}</h2>
+            </div>
+            <span className="text-xs text-ekam-muted">{levelProgress.xp} XP</span>
+          </div>
+          <div className="h-2.5 rounded-full overflow-hidden mb-2" style={{ background: '#EDE4D8' }}>
+            <div className="h-full rounded-full" style={{
+              width: `${levelProgress.pct}%`,
+              background: 'linear-gradient(to right, #8C6210, #C4881A)',
+            }} />
+          </div>
+          <p className="text-xs text-ekam-muted">
+            {levelProgress.nextThreshold - levelProgress.xp} XP to Level {levelProgress.level + 1}
+          </p>
+        </div>
+
+        {/* Badges */}
+        <div className="card-base p-7 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Medal size={17} className="text-ekam-gold" />
+            <h2 className="text-lg font-semibold" style={{ color: '#1C0E04' }}>Badges ({badges.length})</h2>
+          </div>
+          {badges.length === 0 ? (
+            <p className="text-sm text-ekam-muted">Complete a course to earn your first badge.</p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {badges.map(b => (
+                <div key={b.id} className="rounded-xl p-4 text-center" style={{ background: '#FCEADC', border: '1px solid #F0D6BC' }}>
+                  <Award size={22} className="mx-auto mb-2" style={{ color: '#B8460F' }} />
+                  <p className="text-xs font-semibold leading-snug" style={{ color: '#1C0E04' }}>{b.courseTitle}</p>
+                  <p className="text-[10px] mt-1" style={{ color: '#B8460F' }}>{b.tier}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Edit form */}

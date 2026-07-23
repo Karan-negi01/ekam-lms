@@ -7,10 +7,11 @@ import {
   Users, BookOpen, Shield, TrendingUp, CheckCircle2, XCircle,
   Eye, Trash2, Search, Filter, BarChart3, AlertTriangle,
   DollarSign, Star, Globe, Bell, Settings, LogOut, ChevronDown,
-  Clock, Badge, Percent
+  Clock, Badge, Percent, Play
 } from 'lucide-react'
 import { courses as allCourses, instructors, adminStats } from '@/lib/data'
 import { formatPrice, formatNumber, pushNotification } from '@/lib/utils'
+import { getFileUrl } from '@/lib/fileStore'
 import CategoryIcon from '@/components/icons/CategoryIcon'
 
 const NAV = [
@@ -493,10 +494,26 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false, defa
               <span>•</span>
               <span>{course.level}</span>
               <span>•</span>
-              <span>{formatPrice(course.price)}</span>
+              <span>{course.pricingModel === 'subscription' ? 'Subscription' : formatPrice(course.price)}</span>
             </div>
-            {expanded && course.description && (
+            {course.description && (
               <p className="text-xs text-ekam-muted mt-2 leading-relaxed line-clamp-2">{course.description}</p>
+            )}
+            {expanded && (
+              <div className="mt-3 space-y-1 pt-3" style={{ borderTop: '1px solid #EDE4D8' }}>
+                <p className="text-[10px] uppercase tracking-wide text-ekam-muted font-semibold mb-1.5">Videos</p>
+                {course.videoUrl && (
+                  <a href={course.videoUrl} target="_blank" rel="noreferrer"
+                    className="text-xs text-ekam-gold hover:underline flex items-center gap-1.5">
+                    <Play size={11} /> Intro / preview video
+                  </a>
+                )}
+                {course.curriculum?.flatMap((section, sIdx) =>
+                  section.lessons.map((lesson, lIdx) => (
+                    <LessonPreviewLink key={lesson.id || `${sIdx}-${lIdx}`} lesson={lesson} />
+                  ))
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -542,5 +559,37 @@ function CourseApprovalRow({ course, onApprove, onReject, expanded = false, defa
         </div>
       </div>
     </div>
+  )
+}
+
+function LessonPreviewLink({ lesson }) {
+  const [fileUrl, setFileUrl] = useState(null)
+
+  useEffect(() => {
+    if (lesson.videoSource === 'upload' && lesson.videoFileId) {
+      getFileUrl(lesson.videoFileId).then(setFileUrl)
+    }
+  }, [lesson.videoSource, lesson.videoFileId])
+
+  if (lesson.videoSource === 'upload') {
+    return fileUrl ? (
+      <a href={fileUrl} target="_blank" rel="noreferrer" className="text-xs text-ekam-gold hover:underline flex items-center gap-1.5">
+        <Play size={11} /> {lesson.title || 'Untitled lesson'} <span className="text-ekam-muted">(uploaded)</span>
+      </a>
+    ) : (
+      <span className="text-xs text-ekam-muted flex items-center gap-1.5">
+        <Play size={11} /> {lesson.title || 'Untitled lesson'} (uploaded file — only viewable on the instructor's browser)
+      </span>
+    )
+  }
+
+  return lesson.videoUrl ? (
+    <a href={lesson.videoUrl} target="_blank" rel="noreferrer" className="text-xs text-ekam-gold hover:underline flex items-center gap-1.5">
+      <Play size={11} /> {lesson.title || 'Untitled lesson'}
+    </a>
+  ) : (
+    <span className="text-xs text-ekam-muted flex items-center gap-1.5">
+      <Play size={11} /> {lesson.title || 'Untitled lesson'} (no video)
+    </span>
   )
 }

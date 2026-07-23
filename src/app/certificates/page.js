@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Award, CheckCircle2, Search, Download, ShieldCheck, Star } from 'lucide-react'
 import PageHero from '@/components/layout/PageHero'
-import { courses } from '@/lib/data'
+import { courses as staticCourses } from '@/lib/data'
+import { getPublishedUserCourses, getLessonProgress } from '@/lib/utils'
 
 const perks = [
   { icon: ShieldCheck, title: 'Recognized by Institutions', desc: 'Acknowledged by the cultural institutions and gurukuls Ekam partners with across India.' },
@@ -20,21 +21,27 @@ export default function CertificatesPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem('ekam_user')
-    if (stored) setUser(JSON.parse(stored))
+    const u = stored ? JSON.parse(stored) : null
+    setUser(u)
 
-    const enrolled = JSON.parse(localStorage.getItem('ekam_enrolled') || '[]')
-    const done = enrolled.filter(id => {
-      const course = courses.find(c => c.id === id)
-      if (!course) return false
-      const progress = JSON.parse(localStorage.getItem(`ekam_progress_${id}`) || '[]')
-      return progress.length >= (course.totalLessons || Infinity)
-    })
-    setCompleted(done)
+    if (u) {
+      const allCourses = [...staticCourses, ...getPublishedUserCourses()]
+      const enrolled = JSON.parse(localStorage.getItem('ekam_enrolled') || '[]')
+      const done = enrolled.filter(id => {
+        const course = allCourses.find(c => c.id === id)
+        if (!course) return false
+        const totalLessons = course.curriculum?.reduce((a, s) => a + s.lessons.length, 0) || course.totalLessons || Infinity
+        const progress = getLessonProgress(u.id, id)
+        return progress.length >= totalLessons
+      })
+      setCompleted(done)
+    }
   }, [])
 
   const handleVerify = (e) => {
     e.preventDefault()
-    const found = courses.find(c => c.id === verifyId.trim())
+    const allCourses = [...staticCourses, ...getPublishedUserCourses()]
+    const found = allCourses.find(c => c.id === verifyId.trim())
     setVerifyResult(found ? { valid: true, course: found } : { valid: false })
   }
 
@@ -117,7 +124,7 @@ export default function CertificatesPage() {
           ) : (
             <div className="space-y-3">
               {completed.map(id => {
-                const course = courses.find(c => c.id === id)
+                const course = [...staticCourses, ...getPublishedUserCourses()].find(c => c.id === id)
                 return (
                   <div key={id} className="card-base p-5 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(140,98,16,0.08)' }}>

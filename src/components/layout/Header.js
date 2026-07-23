@@ -10,6 +10,8 @@ import { getNotifications, markNotificationsRead } from '@/lib/utils'
 const navLinks = [
   { label: 'Categories', href: '/courses?view=categories' },
   { label: 'Instructors', href: '/instructors' },
+  { label: 'Subscription', href: '/subscription' },
+  { label: 'Leaderboard', href: '/leaderboard' },
 ]
 
 export default function Header() {
